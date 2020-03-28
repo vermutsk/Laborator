@@ -1,21 +1,19 @@
 flag=True
 while flag:
-
     index=input("Введите параметр: ")
     with open("conf", 'r') as file:
         for line in file:
             if line[0] !='#' and line[0] !=';' and line[0] !='\n':
                 str0=line 
-                if str0.startswith(index):
-                    if str0.find(' '):    
-                        list0=str0.split()
+                if str0.startswith(index):   
+                    list0=str0.split(' ', 1)
+                    if len(list0)==1:        
+                        print('True')
+                    else:
                         dict0={}
                         dict0[list0[0]]=list0[1]            
                         for key, value in dict0.items():
                             print(key,':',value)
-                    else:
-                        print(str0)
-
 
     for i in range(3):
         command=input("Прододжить? Y/N :")
