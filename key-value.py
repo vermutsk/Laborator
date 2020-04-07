@@ -1,9 +1,11 @@
 flag=True
 while flag:
     index=input("Введите параметр: ")
-    with open("conf", 'r') as file:
+    with open('conf1', 'r') as file:
         for line in file:
             if line[0] !='#' and line[0] !=';' and line[0] !='\n':
+                if "#" in line:
+                    line = line[0:line.index("#")]
                 str0=line 
                 if str0.startswith(index):   
                     list0=str0.split(' ', 1)
