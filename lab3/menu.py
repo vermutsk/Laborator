@@ -1,69 +1,82 @@
 import json
-print("Главное меню:")
-choice=int(input("1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\nВыбор: ")) 
-if choice==1:
-    choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
-    if choice1==1:
-        crypt='шифр замены'
-    elif choice1==2:
-        crypt='шифр перестановки'
-    elif choice1==3:
-        crypt='шифр гамирования'
-    else:
-        print("Ошибка")
-    way=input("Введите путь к файлу текста: ")
-    if way.endswith(".txt"):
-        text_filename=way
-    else:
-        print("Неправильный формат файла")
-    key=input("Введите путь к файлу ключа: ")
-    if key.endswith(".key"):
-        key_filename=key
-    else:
-        print("Неправильный формат файла")
-    with open(key_filename, "r") as key_file:
-        data = json.load(key_file)
-        if data['alg_type']==crypt:
-            print(crypt)
+flag=True
+while flag:
+    print("Главное меню:")
+    choice=int(input("1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\nВыбор: ")) 
+    if choice==1:
+        choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
+        if choice1==1:
+            crypt='шифр замены'
+        elif choice1==2:
+            crypt='шифр перестановки'
+        elif choice1==3:
+            crypt='шифр гамирования'
         else:
-            print("Неправильный файл ключа")
-elif choice==2:
-    choice2=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
-    if choice2==1:
-        crypt='шифр замены'
-    elif choice2==2:
-        crypt='шифр перестановки'
-    elif choice2==3:
-        crypt='шифр гамирования'
-    else:
-        print("Ошибка")
-    way1=input("Введите путь к файлу шифротекста: ")
-    if way1.endswith(".encode"):
-        crypt_text_filename=way1
-    else:
-        print("Неправильный формат файла")
-    key=input("Введите путь к файлу ключа: ")
-    if key.endswith(".key"):
-        key_filename=key
-    else:
-        print("Неправильный формат файла")
-    with open(key_filename, "r") as key_file:
-        data = json.load(key_file)
-        if data['alg_type']==crypt:
-            print(crypt)
+            print("Ошибка")
+        way=input("Введите путь к файлу текста: ")
+        if way.endswith(".txt"):
+            text_filename=way
         else:
-            print("Неправильный файл ключа")
-
-elif choice==3:
-    choice3=int(input("Сгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\nВыбор: "))
-    if choice3==1:
-        way2=input("Введите путь к файлу алфавита: ")
-        if way1.endswith(".alph"):
-            alph_filename=way2
+            print("Неправильный формат файла")
+        key=input("Введите путь к файлу ключа: ")
+        if key.endswith(".key"):
+            key_filename=key
+        else:
+            print("Неправильный формат файла")
+        with open(key_filename, "r") as key_file:
+            data = json.load(key_file)
+            if data['alg_type']==crypt:
+                print(crypt)
+            else:
+                print("Неправильный файл ключа")
+    elif choice==2:
+        choice2=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
+        if choice2==1:
+            crypt='шифр замены'
+        elif choice2==2:
+            crypt='шифр перестановки'
+        elif choice2==3:
+            crypt='шифр гамирования'
+        else:
+            print("Ошибка")
+        way1=input("Введите путь к файлу шифротекста: ")
+        if way1.endswith(".encode"):
+            crypt_text_filename=way1
+        else:
+            print("Неправильный формат файла")
+        key=input("Введите путь к файлу ключа: ")
+        if key.endswith(".key"):
+            key_filename=key
+        else:
+            print("Неправильный формат файла")
+        with open(key_filename, "r") as key_file:
+            data = json.load(key_file)
+            if data['alg_type']==crypt:
+                print(crypt)
+            else:
+                print("Неправильный файл ключа")
+    elif choice==3:
+        choice3=int(input("Сгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\nВыбор: "))
+        if choice3==1:
+            way2=input("Введите путь к файлу алфавита: ")
+            if way2.endswith(".alph"):
+                alph_filename=way2
+        else:
+            print("Неправильный формат файла")
+        with open(alph_filename, "r", encoding="utf-8") as alph_file:
+            alph_dict={}
+            alph_list=[]
+            print("Неподходящие значения алфавита: ")
+            for line in alph_file:
+                alph_str=line.rstrip('\n')
+                if len(alph_str)!=1:
+                    print(alph_str, ' ', len(alph_str))
+                else:
+                    alph_list.append(alph_str)
+            alph_dict['alp']=alph_list  
+            print(alph_dict) 
     else:
-        print("Неправильный формат файла")   
-else:
-    print('no')
+        print('no')
 
 from abc import ABC, abstractmethod
 
