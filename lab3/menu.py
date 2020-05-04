@@ -4,37 +4,37 @@ while flag:
     choice=int(input("1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\nВыбор: ")) 
     if choice==1:
         choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\n4) Вернуться в главное меню\nВыбор: "))
-        if choice1==1:
-            crypt='шифр замены'
-        elif choice1==2:
-            crypt='шифр перестановки'
-        elif choice1==3:
-            crypt='шифр гамирования'
+        if choice1==1 or choice1==2 or choice1==3:
+            if choice1==1:
+                crypt='шифр замены'
+            elif choice1==2:
+                crypt='шифр перестановки'
+            elif choice1==3:
+                crypt='шифр гамирования'
+            way=input("Введите путь к файлу текста: ")
+            if way.endswith(".txt"):
+                text_filename=way
+            else:
+                print("Неправильный формат файла")
+            
+            key=input("Введите путь к файлу ключа: ")
+            if key.endswith(".key"):
+                key_filename=key
+            else:
+                print("Неправильный формат файла")
+            with open(key_filename, "r", encoding="utf-8") as key_file:
+                key_list=[]
+                for line in key_file:
+                    key_str=line.rstrip('\n')
+                    key_list.append(key_str)
+                    if key_list[0]==crypt:
+                        print(crypt)
+                    else:
+                        print("Неправильный файл ключа")
         elif choice1==4:
             break
         else:
             print("Ошибка")
-        
-        way=input("Введите путь к файлу текста: ")
-        if way.endswith(".txt"):
-            text_filename=way
-        else:
-            print("Неправильный формат файла")
-        
-        key=input("Введите путь к файлу ключа: ")
-        if key.endswith(".key"):
-            key_filename=key
-        else:
-            print("Неправильный формат файла")
-        with open(key_filename, "r", encoding="utf-8") as key_file:
-            key_list=[]
-            for line in key_file:
-                key_str=line.rstrip('\n')
-                key_list.append(key_str)
-                if key_list[0]==crypt:
-                    print(crypt)
-                else:
-                    print("Неправильный файл ключа")
 
 
     elif choice==2:
@@ -140,6 +140,7 @@ while flag:
 
     else:
         print('Ошибка')
+
 
 from abc import ABC, abstractmethod
 
