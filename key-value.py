@@ -27,6 +27,6 @@ while flag:
         else:
             print("Ошибка")
         if i==2:
-         print ("Слишком много ошибок")
-         flag=False
-         break
+            print ("Слишком много ошибок")
+            flag=False
+            break
