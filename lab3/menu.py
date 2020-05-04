@@ -1,4 +1,3 @@
-import json
 flag=True
 while flag:
     print("Главное меню:")
@@ -23,12 +22,15 @@ while flag:
             key_filename=key
         else:
             print("Неправильный формат файла")
-        with open(key_filename, "r") as key_file:
-            data = json.load(key_file)
-            if data['alg_type']==crypt:
-                print(crypt)
-            else:
-                print("Неправильный файл ключа")
+        with open(key_filename, "r", encoding="utf-8") as key_file:
+            key_list=[]
+            for line in key_file:
+                key_str=line.rstrip('\n')
+                key_list.append(key_str)
+                if key_list[0]==crypt:
+                    print(crypt)
+                else:
+                    print("Неправильный файл ключа")
     elif choice==2:
         choice2=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
         if choice2==1:
@@ -40,7 +42,7 @@ while flag:
         else:
             print("Ошибка")
         way1=input("Введите путь к файлу шифротекста: ")
-        if way1.endswith(".encode"):
+        if way1.endswith(".encrypt"):
             crypt_text_filename=way1
         else:
             print("Неправильный формат файла")
@@ -49,12 +51,15 @@ while flag:
             key_filename=key
         else:
             print("Неправильный формат файла")
-        with open(key_filename, "r") as key_file:
-            data = json.load(key_file)
-            if data['alg_type']==crypt:
-                print(crypt)
-            else:
-                print("Неправильный файл ключа")
+        with open(key_filename, "r", encoding="utf-8") as key_file:
+            key_list=[]
+            for line in key_file:
+                key_str=line.rstrip('\n')
+                key_list.append(key_str)
+                if key_list[0]==crypt:
+                    print(crypt)
+                else:
+                    print("Неправильный файл ключа")
     elif choice==3:
         choice3=int(input("Сгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\nВыбор: "))
         if choice3==1:
