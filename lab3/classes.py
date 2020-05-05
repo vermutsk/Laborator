@@ -14,12 +14,15 @@ class Choice():
 
 class Open_file():
     key_list=[]
-    def open_file(self, key_filename, **args):
-        with open(key_filename, "r", encoding="utf-8") as key_file:
+    def __init__(self, crypt, key_filename):
+        self.key_filename=key_filename
+        self.crypt=crypt
+    def open_file(self, **args):
+        with open(self.key_filename, "r", encoding="utf-8") as key_file:
             for line in key_file:
                 key_str=line.rstrip('\n')
                 self.key_list.append(key_str)
-                if self.key_list[0]==choice.crypt:
-                    print(choice.crypt)
+                if self.key_list[0]==self.crypt:
+                    print(self.crypt)
                 else:
                     print("Неправильный файл ключа")
