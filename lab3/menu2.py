@@ -1,1 +1,1 @@
-print("OT")
+print("OTs")
