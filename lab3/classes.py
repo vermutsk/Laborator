@@ -11,8 +11,27 @@ class Choice():
                 self.crypt='шифр гамирования'
         else:
             print(self.choice1, "Ошибка")
+class Ways():
+    def __init__(self, way):
+        self.way=way
+    def file_way(self, **args):
+        if self.way.endswith(".txt"):
+            text_filename=self.way
+            print(text_filename)
+        else:
+            print("Неправильный формат файла")
 
-class Open_file():
+class Ways1():
+    def __init__(self, key):
+        self.key=key
+    def file_way1(self, **args):
+        if self.key.endswith(".key"):
+            key_filename=self.key
+            print(key_filename)
+        else:
+            print("Неправильный формат файла")
+
+class Open_files():
     key_list=[]
     def __init__(self, crypt, key_filename):
         self.key_filename=key_filename
