@@ -31,7 +31,7 @@ class Ways1():
         else:
             print("Неправильный формат файла")
 
-class Open_files():
+class Open_files(Choice, Ways1):
     key_list=[]
     def __init__(self, crypt, key_filename):
         self.key_filename=key_filename
