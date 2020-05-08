@@ -36,86 +36,82 @@ def choice():
 def alp_test():
     with open(fileway, "r", encoding="utf-8") as alph_file:
         alph_list=[]
-        i=0
+        alph_list1=[]
         for line in alph_file:
             alph_str=line.rstrip('\n')
             if len(alph_str)!=1:
-                while i==0:
-                    print("Неподходящие значения алфавита: ")
-                    i=+1
-                print(alph_str)
+                pass
             else:
                 alph_list.append(alph_str)
         def no_repeat(alph_list):
-            alph_list1=[]
             for z in alph_list:
                 if z not in alph_list1:
                     alph_list1.append(z)
             return alph_list1
-        alph_list2=no_repeat(alph_list)
-    return alph_list2
+        no_repeat(alph_list)
+    return alph_list1
 
 flag=True
 while flag:
     print("Главное меню:")
-    choice=int(input("1) Зашифровать\n2) Расшифровать\n\3) Сгенерировать ключ\nВыбор: ")) 
+    choice=int(input("1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\nВыбор: ")) 
     
-    if choice==1:
-        choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\n4) Вернуться в главное меню\nВыбор: "))
+    '''Зашифровать'''
+    if choice==1: 
+        choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
         if choice1==1 or choice1==2 or choice1==3:
             file="txt"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу текста: ")
             test()
-            print(fileway)
             file="key"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу ключа: ")
             test()
             choice()
         else:
             raise Exception
-
+    
+        '''Расшифровать'''        
     elif choice==2:
-        choice1=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\n4) Вернуться в главное меню\nВыбор: "))
+        choice1=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
         if choice1==1 or choice1==2 or choice1==3:
             file="encode"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу шифротекста: ")
             test()
             file="key"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу ключа: ")
             test()
             choice()
         else:
             raise Exception
-
-
+    
+        '''Сгенерировать ключ'''
     elif choice==3:
         choice3=int(input("Сгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\n4) Вернуться в главное меню\nВыбор: "))
         file="key"
-        fileway=input(f"Fileway for {file}:")
+        fileway=input("Введите путь для создания файла ключа: ")
         test()
+        key_fileway=fileway
         if choice3==1:
             file="alph"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу алфавита: ")
             test()
-            alph_list2=alp_test()
+            alph_list1=alp_test()
             alph_dict={}
-            alph_dict['alp']=alph_list2  
-            print(alph_dict)
+            alph_dict['alp']=alph_list1
 
         elif choice3==2:
             len_crypt=int(input("Введите длину блока: "))
 
         elif choice3==3:
             file="alph"
-            fileway=input(f"Fileway for {file}:")
+            fileway=input("Введите путь к файлу алфавита: ")
             test()
-            alph_list2=alp_test()
-            len_alph=len(alph_list2)  
-            print(len_alph)
+            alph_list1=alp_test()
+            len_alph=len(alph_list1)
             len_crypt1=int(input("Введите длину блока: "))
         else:
             raise Exception         
-        with open(fileway, "x", encoding="utf-8") as key_file:
+        with open(key_fileway, "x", encoding="utf-8") as key_file:
             key_file.write("Test string")
             key_file.close()
     else:
