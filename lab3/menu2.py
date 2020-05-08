@@ -18,14 +18,18 @@ class MyAbstractClass(ABC):
         raise Exception
     
     def _read_text(self, text_filename: str):
-        with open(text_filename, "r", encoding="utf-8") as text_file:
-            text_filename=[]
-            for line in text_file:
-                str0=list(line)
-                text_filename.extend(str0)
-            if len(text_filename)!=0:
-                print(text_filename)
-        raise Exception
+        try:
+            with open(text_filename, "r", encoding="utf-8") as text_file:
+                text_filename=[]
+                for line in text_file:
+                    str0=list(line)
+                    text_filename.extend(str0)
+                if len(text_filename)!=0:
+                    pass
+                else:
+                    raise Exception 
+        except FileNotFoundError:
+            print("Файл текста не найден") 
 
 
 class ChangeEncrypt(MyAbstractClass):
@@ -56,15 +60,18 @@ def test():
     return fileway
 
 def key_open(crypt):
-    with open(fileway, "r", encoding="utf-8") as key_file:
-        key_list=[]
-        for line in key_file:
-            key_str=line.rstrip('\n')
-            key_list.append(key_str)
-            if key_list[0]==crypt:
-                pass
-            else:
-                raise Exception
+    try:
+        with open(fileway, "r", encoding="utf-8") as key_file:
+            key_list=[]
+            for line in key_file:
+                key_str=line.rstrip('\n')
+                key_list.append(key_str)
+                if key_list[0]==crypt:
+                    pass
+                else:
+                    raise Exception
+    except FileNotFoundError:
+        print("Файл ключа не найден")    
     return key_list
 
 def choiced():
@@ -80,21 +87,26 @@ def choiced():
     return crypt
 
 def alp_test():
-    with open(fileway, "r", encoding="utf-8") as alph_file:
-        alph_list=[]
-        alph_list1=[]
-        for line in alph_file:
-            alph_str=line.rstrip('\n')
-            if len(alph_str)!=1:
-                pass
-            else:
-                alph_list.append(alph_str)
-        def no_repeat(alph_list):
-            for z in alph_list:
-                if z not in alph_list1:
-                    alph_list1.append(z)
-            return alph_list1
-        no_repeat(alph_list)
+    try:
+        with open(fileway, "r", encoding="utf-8") as alph_file:
+            alph_list=[]
+            alph_list1=[]
+            for line in alph_file:
+                alph_str=line.rstrip('\n')
+                if len(alph_str)!=1:
+                    pass
+                else:
+                    alph_list.append(alph_str)
+            def no_repeat(alph_list):
+                for z in alph_list:
+                    if z not in alph_list1:
+                        alph_list1.append(z)
+                return alph_list1
+            no_repeat(alph_list)
+            if len(alph_list1)==0:
+                raise Exception("В файле алфавита нет подходящих значений")
+    except FileNotFoundError:
+        print("Файл алфавита не найден")            
     return alph_list1
 
 flag=True
@@ -104,19 +116,22 @@ while flag:
     
     '''Зашифровать'''
     if choice==1: 
-        choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
-        if choice1==1 or choice1==2 or choice1==3:
-            file="txt"
-            fileway=input("Введите путь к файлу текста: ")
-            test()
-            text_filename=fileway
-            file="key"
-            fileway=input("Введите путь к файлу ключа: ")
-            test()
-            key_filename=fileway
-            choiced()
-        else:
-            raise Exception
+        try:
+            choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
+            if choice1==1 or choice1==2 or choice1==3:
+                file="txt"
+                fileway=input("Введите путь к файлу текста: ")
+                test()
+                text_filename=fileway
+                file="key"
+                fileway=input("Введите путь к файлу ключа: ")
+                test()
+                key_filename=fileway
+                choiced()
+            else:
+                print("Ошибка выбора")
+        except UnboundLocalError:
+            pass
         if choice1==1:
             change=ChangeEncrypt()
             change._read_text(text_filename)
@@ -145,6 +160,7 @@ while flag:
         fileway=input("Введите путь для создания файла ключа: ")
         test()
         key_fileway=fileway
+        
         if choice3==1:
             file="alph"
             fileway=input("Введите путь к файлу алфавита: ")
@@ -164,9 +180,11 @@ while flag:
             len_alph=len(alph_list1)
             len_crypt1=int(input("Введите длину блока: "))
         else:
-            raise Exception         
-        with open(key_fileway, "x", encoding="utf-8") as key_file:
-            key_file.write("Test string")
-            key_file.close()
+            raise Exception("Ошибка ввода")         
+        try:
+            with open(key_fileway, "x", encoding="utf-8") as key_file:
+                key_file.write("Test string")
+        except FileExistsError:
+            print("Файл ключа с таким именем уже существует")
     else:
-        raise Exception
+        raise Exception("Ошибка ввода")
