@@ -29,25 +29,27 @@ class MyAbstractClass(ABC):
 
 
 class ChangeEncrypt(MyAbstractClass):
-    def __init__(self):
+    def __init__(self, text_filename: str, key_filename: str, encrypted_filename: str):
+        self.text_filename=text_filename
+        self.key_filename=key_filename
+        self.encrypted_filename=encrypted_filename
+
+    def encrypt(self, **args) -> bool:
         pass
 
-    def encrypt(self, text_filename: str,key_filename: str,**args) -> bool:
-        pass
-
-    def decrypt(self, encrypted_filename: str, key_filename: str,**args) -> bool:
+    def decrypt(self, **args) -> bool:
         pass
 
     def gen_key(self, **args) -> bool:
         pass
 
-    def _read_encrypt(self, encrypted_filename: str) -> bool:
+    def _read_encrypt(self, ) -> bool:
         """прочитать защифрованный файл
         encrypted_filename -- имя файла для чтения
         """
         pass
 
-    def _read_key(self, key_filename: str) -> bool:
+    def _read_key(self, ) -> bool:
         """метод для чтения ключа
         key_filename -- имя файла для чтения
         """
