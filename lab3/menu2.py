@@ -1,3 +1,53 @@
+from abc import ABC, abstractmethod
+
+class MyAbstractClass(ABC):
+
+    @abstractmethod
+    def encrypt(self, text_filename: str, key_filename: str, **args):
+        print('yes')
+        raise Exception
+
+    @abstractmethod
+    def decrypt(self,encrypted_filename: str,key_filename: str,**args):
+        print('yes')
+        raise Exception
+
+    @abstractmethod
+    def gen_key(self, **args):
+        print('yes')
+        raise Exception
+    
+    def _read_text(self, text_filename: str):
+        with open(text_filename, "r", encoding="utf-8") as text_file:
+            text_filename=[]
+            for line in text_file:
+                str0=list(line)
+                text_filename.extend(str0)
+            if len(text_filename)!=0:
+                print(text_filename)
+        raise Exception
+
+
+class ChangeEncrypt(MyAbstractClass):
+    def __init__(self):
+        pass
+
+    def encrypt(self, text_filename: str,key_filename: str,**args):
+        print("yes")
+
+    def decrypt(self, encrypted_filename: str, key_filename: str,**args):
+        pass
+
+    def gen_key(self, **args):
+        pass
+
+    def _read_encrypt(self, encrypted_filename: str):
+        pass
+
+    def _read_key(self, key_filename: str):
+        pass
+
+
 def test():
     if fileway.endswith(f".{file}"):
         pass
@@ -8,20 +58,16 @@ def test():
 def key_open(crypt):
     with open(fileway, "r", encoding="utf-8") as key_file:
         key_list=[]
-        s=0
         for line in key_file:
             key_str=line.rstrip('\n')
             key_list.append(key_str)
             if key_list[0]==crypt:
                 pass
             else:
-                if s==0:
-                    print("Неправильный файл ключа")
-                    s=+1
-        raise Exception
+                raise Exception
     return key_list
 
-def choice():
+def choiced():
     if choice1==1:
         crypt='шифр замены'
         key_open(crypt)
@@ -63,12 +109,18 @@ while flag:
             file="txt"
             fileway=input("Введите путь к файлу текста: ")
             test()
+            text_filename=fileway
             file="key"
             fileway=input("Введите путь к файлу ключа: ")
             test()
-            choice()
+            key_filename=fileway
+            choiced()
         else:
             raise Exception
+        if choice1==1:
+            change=ChangeEncrypt()
+            change._read_text(text_filename)
+            change.encrypt(text_filename,key_filename)
     
         '''Расшифровать'''        
     elif choice==2:
@@ -77,10 +129,12 @@ while flag:
             file="encode"
             fileway=input("Введите путь к файлу шифротекста: ")
             test()
+            encrypted_filename=fileway
             file="key"
             fileway=input("Введите путь к файлу ключа: ")
             test()
-            choice()
+            key_filename=fileway
+            choiced()
         else:
             raise Exception
     
