@@ -3,21 +3,13 @@ from abc import ABC, abstractmethod
 class MyAbstractClass(ABC):
     @abstractmethod
     def encrypt(self,text_filename: str,key_filename: str, **args) -> bool:
-        '''
-        шифрование файла по ключу
-        text_filename -- имя файла для зашифрования
-        key_filename -- имя файла ключа
-        '''
+        
         raise Exception("Данный метод переопределяется в дочернем классе.\
              Его логика уникальная для каждого отдельного класса.")
 
     @abstractmethod
     def decrypt(self,encrypted_filename: str,key_filename: str,**args) -> bool:
-        '''
-        расшифрование файла по ключу
-        encrypted_filename -- имя файла для расшифрования
-        key_filename -- имя файла ключа
-        '''
+        
         raise Exception("Данный метод переопределяется в дочернем классе.\
              Его логика уникальная для каждого отдельного класса.")
 
@@ -32,6 +24,59 @@ class MyAbstractClass(ABC):
         raise Exception("Данный метод реализуется в этом классе.\
                          Его логика не меняется для всех классов.")
 
+
+
+
+
+class ChangeEncrypt(MyAbstractClass):
+    def __init__(self):
+        pass
+
+    def encrypt(self, text_filename: str,key_filename: str,**args) -> bool:
+        pass
+
+    def decrypt(self, encrypted_filename: str, key_filename: str,**args) -> bool:
+        pass
+
+    def gen_key(self, **args) -> bool:
+        pass
+
+    def _read_encrypt(self, encrypted_filename: str) -> bool:
+        """прочитать защифрованный файл
+        encrypted_filename -- имя файла для чтения
+        """
+        pass
+
+    def _read_key(self, key_filename: str) -> bool:
+        """метод для чтения ключа
+        key_filename -- имя файла для чтения
+        """
+        pass
+
+class ReplaceEncrypt(MyAbstractClass):
+    def __init__(self):
+        pass
+
+    def encrypt(self, text_filename: str,key_filename: str,**args) -> bool:
+        pass
+
+    def decrypt(self, encrypted_filename: str, key_filename: str,**args) -> bool:
+        pass
+
+    def gen_key(self, **args) -> bool:
+        pass
+
+    def _read_encrypt(self, encrypted_filename: str) -> bool:
+        """прочитать защифрованный файл
+        encrypted_filename -- имя файла для чтения
+        """
+        pass
+
+    def _read_key(self, key_filename: str) -> bool:
+        """метод для чтения ключа
+        key_filename -- имя файла для чтения
+        """
+        pass
 
 class GammEncrypt(MyAbstractClass):
     def __init__(self):
@@ -59,67 +104,73 @@ class GammEncrypt(MyAbstractClass):
         pass
 
 
-class ReplaceEncrypt(MyAbstractClass):
-    def __init__(self):
-        pass
-
-    def encrypt(self, text_filename: str,key_filename: str,**args) -> bool:
-        pass
-
-    def decrypt(self, encrypted_filename: str, key_filename: str,**args) -> bool:
-        pass
-
-    def gen_key(self, **args) -> bool:
-        pass
-
-    def _read_encrypt(self, encrypted_filename: str) -> bool:
-        """прочитать защифрованный файл
-        encrypted_filename -- имя файла для чтения
-        """
-        pass
-
-    def _read_key(self, key_filename: str) -> bool:
-        """метод для чтения ключа
-        key_filename -- имя файла для чтения
-        """
-        pass
+'''Шифр Виженера = гамирования'''
 
 
+def form_dict():
+    d = {}
+    iter = 0
+    for i in range(0,127):
+        d[iter] = chr(i)
+        iter = iter +1
+    return d
+
+def encode_val(word):
+    list_code = []
+    lent = len(word)
+    d = form_dict() 
+
+    for w in range(lent):
+        for value in d:
+            if word[w] == d[value]:
+               list_code.append(value) 
+    return list_code
+
+def comparator(value, key):
+    len_key = len(key)
+    dic = {}
+    iter = 0
+    full = 0
+
+    for i in value:
+        dic[full] = [i,key[iter]]
+        full = full + 1
+        iter = iter +1
+        if (iter >= len_key):
+            iter = 0 
+    return dic 
+
+def full_encode(value, key):
+    dic = comparator(value, key)
+    print('Compare full encode', dic)
+    lis = []
+    d = form_dict()
+
+    for v in dic:
+        go = (dic[v][0]+dic[v][1]) % len(d)
+        lis.append(go) 
+    return lis
+
+def decode_val(list_in):
+    list_code = []
+    lent = len(list_in)
+    d = form_dict() 
+
+    for i in range(lent):
+        for value in d:
+            if list_in[i] == value:
+               list_code.append(d[value]) 
+    return list_code
+
+def full_decode(value, key):
+    dic = comparator(value, key)
+    print('Deshifre=', dic)
+    d = form_dict() 
+    lis =[]
+
+    for v in dic:
+        go = (dic[v][0]-dic[v][1]+len(d)) % len(d)
+        lis.append(go) 
+    return lis  
 
 
-
-
-class Ways():
-    def __init__(self, way):
-        self.way=way
-    def file_way(self, *args):
-        if self.way.endswith(".txt"):
-            text_filename=self.way
-            print(text_filename)
-        else:
-            print("Неправильный формат файла")
-
-class Ways1():
-    def __init__(self, key):
-        self.key=key
-    def file_way1(self, *args):
-        if self.key.endswith(".key"):
-            key_filename=self.key
-            print(key_filename)
-        else:
-            print("Неправильный формат файла")
-
-class Open_files(Ways1):
-    key_list=[]
-    def __init__(self, crypt, key_filename):
-        self.key_filename=key_filename
-        self.crypt=crypt
-    def open_file(self, *args):
-        with open(self.key_filename, "r", encoding="utf-8") as key_file:
-            for line in key_file:
-                key_str=line.rstrip('\n')
-                self.key_list.append(key_str)
-                if self.key_list[0]==self.crypt:
-                    print(self.crypt)
-                else:
-                    print("Неправильный файл ключа")
