@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+import random
 
-class MyAbstractClass(ABC):
+class AbstractClass(ABC):
 
     @abstractmethod
     def encrypt(self, text_filename: str, key_filename: str, **args):
@@ -8,183 +9,250 @@ class MyAbstractClass(ABC):
         raise Exception
 
     @abstractmethod
-    def decrypt(self,encrypted_filename: str,key_filename: str,**args):
-        print('yes')
-        raise Exception
+    def decrypt(self, **args):
+        encrypt_filename=self.encrypt_open
+        print(encrypt_filename)
+        key_filename=self.key_open
+        print(key_filename)
+        '''raise Exception'''
 
     @abstractmethod
     def gen_key(self, **args):
-        print('yes')
+        flag1=True
+        while flag1:
+            way=input("Введите путь для создания файла ключа: ")
+            try:
+                if way.endswith(".key"):
+                    key_fileway=way
+                else:
+                    print("Неправильный тип файла")
+                with open(key_fileway, "x", encoding="utf-8") as key_file:
+                    key_file.write("Test string") 
+            except Exception:
+                print("Ошибка в пути файла")
+            
         raise Exception
     
-    def _read_text(self, text_filename: str):
-        try:
-            with open(text_filename, "r", encoding="utf-8") as text_file:
-                text_filename=[]
-                for line in text_file:
-                    str0=list(line)
-                    text_filename.extend(str0)
-                if len(text_filename)!=0:
+
+    ###########################################################
+
+
+    def _test_way(self, file):
+        flag1=True
+        while flag1:
+            way=input(f"Введите путь к {file} файлу: ")
+            try:
+                if way.endswith(f".{file}"):
                     pass
                 else:
-                    raise Exception 
-        except FileNotFoundError:
-            print("Файл текста не найден") 
+                    print("Неправильный тип файла")
+                return way 
+            except Exception:
+                print("Ошибка в пути файла")
+
+    def _read_text(self):
+        way=self._test_way('txt')
+        with open(way, "r", encoding="utf-8") as text_file:
+            text_filename=[]
+            for line in text_file:
+                str0=list(line)
+                text_filename.extend(str0)
+            if len(text_filename)!=0:
+                return text_filename
+            else:
+                print("Пустой файл")
+
+    def encrypt_open(self):
+        way=self._test_way('encrypt')
+        with open(way, "r", encoding="utf-8") as text_file:
+            text_filename=[]
+            for line in text_file:
+                str0=list(line)
+                text_filename.extend(str0)
+            if len(text_filename)!=0:
+                return text_filename
+            else:
+                print("Пустой файл")
 
 
-class ChangeEncrypt(MyAbstractClass):
-    def __init__(self):
-        pass
-
-    def encrypt(self, text_filename: str,key_filename: str,**args):
-        print("yes")
-
-    def decrypt(self, encrypted_filename: str, key_filename: str,**args):
-        pass
-
-    def gen_key(self, **args):
-        pass
-
-    def _read_encrypt(self, encrypted_filename: str):
-        pass
-
-    def _read_key(self, key_filename: str):
-        pass
-
-
-def test():
-    if fileway.endswith(f".{file}"):
-        pass
-    else:
-        raise Exception
-    return fileway
-
-def key_open(crypt):
-    try:
-        with open(fileway, "r", encoding="utf-8") as key_file:
+    def key_open(self, crypt):
+        way=self._test_way('key')
+        with open(way, "r", encoding="utf-8") as key_file:
             key_list=[]
             for line in key_file:
                 key_str=line.rstrip('\n')
                 key_list.append(key_str)
-                if key_list[0]==crypt:
-                    pass
-                else:
-                    raise Exception
-    except FileNotFoundError:
-        print("Файл ключа не найден")    
-    return key_list
+            if key_list[0]==crypt:
+                pass
+            else:
+                print("Файл ключа для другого метода")    
+        return key_list
 
-def choiced():
-    if choice1==1:
-        crypt='шифр замены'
-        key_open(crypt)
-    elif choice1==2:
-        crypt='шифр перестановки'
-        key_open(crypt)
-    elif choice1==3:
-        crypt='шифр гамирования'
-        key_open(crypt)
-    return crypt
 
-def alp_test():
-    try:
-        with open(fileway, "r", encoding="utf-8") as alph_file:
-            alph_list=[]
-            alph_list1=[]
-            for line in alph_file:
-                alph_str=line.rstrip('\n')
-                if len(alph_str)!=1:
-                    pass
-                else:
-                    alph_list.append(alph_str)
-            def no_repeat(alph_list):
-                for z in alph_list:
-                    if z not in alph_list1:
-                        alph_list1.append(z)
-                return alph_list1
-            no_repeat(alph_list)
-            if len(alph_list1)==0:
-                raise Exception("В файле алфавита нет подходящих значений")
-    except FileNotFoundError:
-        print("Файл алфавита не найден")            
-    return alph_list1
+    def alp_open(self):
+        way=self._test_way('alph')
+        try:
+            with open(way, "r", encoding="utf-8") as alph_file:
+                alph_list=[]
+                alph_list1=[]
+                for line in alph_file:
+                    alph_str=line.rstrip('\n')
+                    if len(alph_str)!=1:
+                        pass
+                    else:
+                        alph_list.append(alph_str)
+                def no_repeat(alph_list):
+                    for z in alph_list:
+                        if z not in alph_list1:
+                            alph_list1.append(z)
+                    return alph_list1
+                no_repeat(alph_list)
+                if len(alph_list1)==0:
+                    print("В файле алфавита нет подходящих значений")
+        except FileNotFoundError:
+            print("Файл алфавита не найден")            
+        return alph_list1
+#########################################
+
+
+class ChangeEncrypt(AbstractClass):
+    
+    def __init__(self):
+        self.crypt='шифр замены'
+
+    def encrypt(self, **args):
+        pass
+
+    def decrypt(self, **args):
+        pass
+
+    def gen_key(self, **args):
+        alph_list=self.alp_open()
+        alph_dict={}
+        alph_dict['alp']=alph_list
+        print(alph_dict)
+
+    def _read_encrypt(self):
+        pass
+
+    def _read_key(self):
+        pass
+
+class ReplaceEncrypt(AbstractClass):
+    def __init__(self):
+        self.crypt='шифр перестановки'
+
+    def encrypt(self, **args):
+        pass
+
+    def decrypt(self, **args):
+        pass
+
+    def gen_key(self, **args):
+        len_crypt=int(input("Введите длину блока: "))
+        return len_crypt
+
+    def _read_encrypt(self):
+        pass
+
+    def _read_key(self):
+        """метод для чтения ключа
+        key_filename -- имя файла для чтения
+        """
+        pass
+
+class GammEncrypt(AbstractClass):
+    def __init__(self):
+        self.crypt='шифр гамирования'
+
+    def encrypt(self, **args):
+        pass
+
+    def decrypt(self, **args):
+        pass
+
+    def gen_key(self, **args):
+        alph_list=self.alp_open()
+        len_alph=len(alph_list)
+        len_crypt=int(input("Введите длину блока: "))
+
+    def _read_encrypt(self):
+        way=self._test_way('encrypt')
+        return way
+
+    def _read_key(self):
+        """метод для чтения ключа
+        key_filename -- имя файла для чтения
+        """
+        pass
+change=ChangeEncrypt()
+replace=ReplaceEncrypt()
+gamm=GammEncrypt()
+########
 
 flag=True
 while flag:
-    print("Главное меню:")
-    choice=int(input("1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\nВыбор: ")) 
-    
-    '''Зашифровать'''
-    if choice==1: 
-        try:
-            choice1=int(input("Выберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
-            if choice1==1 or choice1==2 or choice1==3:
-                file="txt"
-                fileway=input("Введите путь к файлу текста: ")
-                test()
-                text_filename=fileway
-                file="key"
-                fileway=input("Введите путь к файлу ключа: ")
-                test()
-                key_filename=fileway
-                choiced()
-            else:
-                print("Ошибка выбора")
-        except UnboundLocalError:
-            pass
-        if choice1==1:
-            change=ChangeEncrypt()
-            change._read_text(text_filename)
-            change.encrypt(text_filename,key_filename)
-    
-        '''Расшифровать'''        
-    elif choice==2:
-        choice1=int(input("Выберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\nВыбор: "))
-        if choice1==1 or choice1==2 or choice1==3:
-            file="encode"
-            fileway=input("Введите путь к файлу шифротекста: ")
-            test()
-            encrypted_filename=fileway
-            file="key"
-            fileway=input("Введите путь к файлу ключа: ")
-            test()
-            key_filename=fileway
-            choiced()
-        else:
-            raise Exception
-    
-        '''Сгенерировать ключ'''
-    elif choice==3:
-        choice3=int(input("Сгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\n4) Вернуться в главное меню\nВыбор: "))
-        file="key"
-        fileway=input("Введите путь для создания файла ключа: ")
-        test()
-        key_fileway=fileway
-        
-        if choice3==1:
-            file="alph"
-            fileway=input("Введите путь к файлу алфавита: ")
-            test()
-            alph_list1=alp_test()
-            alph_dict={}
-            alph_dict['alp']=alph_list1
+    flag2=True
+    try:
+        print("\nГлавное меню:")
+        choice=int(input("\n1) Зашифровать\n2) Расшифровать\n3) Сгенерировать ключ\n4) Выйти из программы\nВыбор: "))
+        if choice==1:       
+            while flag2:
+                choice1=int(input("\nВыберите метод шифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\n4)Вернуться в главное меню\nВыбор: "))
+                if choice1!=1 and choice1!=2 and choice1!=3:
+                    print("Ошибка ввода")
+                elif choice1==4:
+                    flag2==False
+                    break
+                if choice1==1:
+                    change.encrypt()
+                elif choice1==2:
+                    replace.encrypt()
+                elif choice1==3:
+                    gamm.encrypt()       
 
-        elif choice3==2:
-            len_crypt=int(input("Введите длину блока: "))
+        elif choice==2:     
+            while flag2:
+                choice1=int(input("\nВыберите метод расшифровки:\n1) Метод замены\n2) Метод перестановки\n3) Метод гамирования\n4)Вернуться в главное меню\nВыбор: "))
+                if choice1!=1 and choice1!=2 and choice1!=3:
+                    print("Ошибка ввода")
+                elif choice1==4:
+                    flag2==False
+                    break
+                if choice1==1:
+                    change.decrypt()
+                elif choice1==2:
+                    replace.decrypt()
+                elif choice1==3:
+                    gamm.decrypt()                  
+                
+        elif choice==3:     
+            while flag2:
+                choice1=int(input("\nСгенерировать ключ для следующего алгоритма: \n1) Шифр замены\n2) Шифр перестановки\n3) Шифр гамирования\n4) Вернуться в главное меню\nВыбор: "))
+                if choice1!=1 and choice1!=2 and choice1!=3:
+                    print("Ошибка ввода")
+                elif choice1==4:
+                    flag2==False
+                    break     
+                if choice1==1:
+                    change.gen_key()    
+                elif choice1==2:
+                    replace.gen_key()    
+                elif choice1==3:
+                    gamm.gen_key()
 
-        elif choice3==3:
-            file="alph"
-            fileway=input("Введите путь к файлу алфавита: ")
-            test()
-            alph_list1=alp_test()
-            len_alph=len(alph_list1)
-            len_crypt1=int(input("Введите длину блока: "))
+        elif choice==4:
+            flag==False
+            break
         else:
-            raise Exception("Ошибка ввода")         
-        try:
-            with open(key_fileway, "x", encoding="utf-8") as key_file:
-                key_file.write("Test string")
-        except FileExistsError:
-            print("Файл ключа с таким именем уже существует")
-    else:
-        raise Exception("Ошибка ввода")
+            print("Ошибка ввода\n")
+    except ValueError:
+        pass
+    except SyntaxError:
+        print("Wrong command")
+    except UnboundLocalError:
+        print("UnboundLocalError")
+    except FileNotFoundError:
+        print("File not found")                     
+    except FileExistsError:
+        print("Файл с таким именем уже существует")
