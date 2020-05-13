@@ -235,8 +235,23 @@ class ReplaceEncrypt(AbstractClass):
         pass
 
     def gen_key(self, **args):
-        len_crypt=int(input("Введите длину блока: "))
-        return len_crypt
+        try:
+            len_key=int(input("Введите длину ключа: "))
+            key_list=[x for x in range(1, len_key)]
+            random.shuffle(key_list)
+            key_fileway=self._create_file('key')
+            with open(key_fileway,'w',encoding='utf-8') as key_file:
+                    key_file.write('шифр перестановки')
+                    key_file.write(f"\n{len_key}")
+                    i=0
+                    str0=''
+                    while i<len(key_list):                   
+                        str0=str0 + str(key_list[i])
+                        i+=1 
+                    key_file.write(str0)
+        except Exception():
+            print("Ошибка ввода")        
+       
         
 
     def _read_encrypt(self):
@@ -278,7 +293,7 @@ class GammEncrypt(AbstractClass):
 change=ChangeEncrypt()
 replace=ReplaceEncrypt()
 gamm=GammEncrypt()
-########
+#######################################################################################
 
 flag=True
 while flag:
