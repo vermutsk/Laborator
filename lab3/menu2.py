@@ -123,14 +123,22 @@ class ChangeEncrypt(AbstractClass):
             with open(encrypt_way,'w', encoding='utf-8') as encrypt_file:
                 encrypt_file.write('шифр замены\n')
                 str0=''
-                for line in text_file:  
-                    for ch in line:
-                        for key in key_dict.items():   
-                            if ch==key:         
-                                ch_new=key_dict[key]
-                                str0=str0 + ch_new
-                        str0=str0+ch
-                        encrypt_file.write(str0)
+                for line in text_file:
+                    str1=list(line)
+                    i=len(str1)
+                    k=0
+                    while k<i:  
+                        for key in key_dict.keys():   
+                            if str1[k]==key:         
+                                str1[k]=key_dict[key]
+                                str0=str0+str1[k]
+                                str1[k]=''
+                                break
+                        str0=str0+str1[k]
+                        k+=1
+                    encrypt_file.write(str0)
+                    str0=''
+                    
             flag==False 
             print("Operation succesfull completed")
             break   
