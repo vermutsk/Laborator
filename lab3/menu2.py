@@ -50,17 +50,13 @@ class AbstractClass(ABC):
             flag=False
             break
 
-    def _read_text(self):
-        text_list=self.text_open()
-        print(text_list)
 
     def text_open(self):
         way=self._test_way('txt')
         with open(way, "r", encoding="utf-8") as text_file:
             text_list=[]
             for line in text_file:
-                str0=list(line)
-                text_list.extend(str0)
+                text_list.extend(list(line))
             if len(text_list)!=0:
                 return text_list
             else:
@@ -227,12 +223,9 @@ class ReplaceEncrypt(AbstractClass):
         pass
 
     def encrypt(self, **args):
-        text_file=open(self._test_way('txt'), "r", encoding='utf-8')
+        text_list=self.text_open()
         key_list=self.read_key()
         len_key=len(key_list)
-        text_list=[]
-        for line in text_file:
-            text_list.extend(list(line))
         while len(text_list)%len_key!=0:
             text_list.append(random.choice(text_list))
         len_text=len(text_list)
@@ -276,8 +269,39 @@ class ReplaceEncrypt(AbstractClass):
         
 
     def decrypt(self, **args):
-        pass
-
+        key_list=self.read_key()
+        len_key=len(key_list)
+        encrypt_list=self.read_encrypt(len_key)
+        len_encrypt=len(encrypt_list)
+        flag1=True
+        while flag1:
+            decrypt_way=self._create_file('txt')
+            with open(decrypt_way,'w', encoding='utf-8') as decrypt_file:
+                str0='' 
+                flag=True
+                k=0
+                p=0
+                while flag:
+                    block_lict=[None]*len_key
+                    for i in range(len_encrypt):
+                        elem=encrypt_list[i]
+                        ind=int(key_list[k])
+                        k=(k+1)%len_key
+                        for x in range(len_key):
+                            if (x+1)==ind:
+                                block_lict.pop(x)
+                                block_lict.insert(x, elem)
+                                print(block_lict)
+                        p+=1
+                        if p==len_key:
+                            for z in range(len_key):
+                                str0=str0+f'{block_lict[z]}'
+                                print(str0)
+                            block_lict=[None]*len_key
+                            p=0
+                    decrypt_file.write(str0)
+                    flag=False
+                    break  
     def gen_key(self, **args):
         flag=True
         while flag:
@@ -294,7 +318,6 @@ class ReplaceEncrypt(AbstractClass):
                 random.shuffle(key_list)
                 key_fileway=self._create_file('key')
                 with open(key_fileway,'w',encoding='utf-8') as key_file:
-                        key_file.write('шифр перестановки\n')
                         i=0
                         str0=''
                         while i<len(key_list):                   
@@ -309,9 +332,16 @@ class ReplaceEncrypt(AbstractClass):
        
         
 
-    def read_encrypt(self):
-        encrypt_filename=self.encrypt_open('шифр перестановки')
-        print(encrypt_filename)
+    def read_encrypt(self, len_key):
+        encrypt_file=open(self.encrypt_open('шифр перестановки'),'r', encoding='utf-8' )
+        encrypt_list=[]
+        i=0
+        for line in encrypt_file:
+            if i<1:
+                i+=1
+            else:
+                encrypt_list.extend(list(line))
+        return encrypt_list
 
     def read_key(self):
         key_filename=self.key_open('шифр перестановки')
