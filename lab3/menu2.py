@@ -19,7 +19,7 @@ class AbstractClass(ABC):
         '''raise Exception'''
     
 
-    ##############################################################################
+    ###################################################################################
 
 
     def _test_way(self, file):
@@ -49,7 +49,6 @@ class AbstractClass(ABC):
                 print("Ошибка в пути файла")
             flag=False
             break
-
 
     def text_open(self):
         way=self._test_way('txt')
@@ -91,20 +90,30 @@ class AbstractClass(ABC):
                 pass
             else:
                 print("Файл ключа для другого метода")    
-        return way
+            if len(key_list)!=0:
+                return way
+            else:
+                print("Пустой файл")
 
     def alp_open(self):
-        way=self._test_way('alph')
-        with open(way, "r", encoding="utf-8") as alph_file:
-            alph_list=[]
-            for line in alph_file:
-                alph_str=line.rstrip('\n')
-                if len(alph_str)==1 and line[0]!='\n':
-                    alph_list.append(alph_str)
-            alph_list1=self.no_repeat(alph_list)
-            if len(alph_list1)==0:
-                print("В файле алфавита нет подходящих значений")            
-        return alph_list1
+        flag=True
+        while flag:
+            try:
+                way=self._test_way('alph')
+                with open(way, "r", encoding="utf-8") as alph_file:
+                    alph_list=[]
+                    for line in alph_file:
+                        alph_str=line.rstrip('\n')
+                        if len(alph_str)==1 and line[0]!='\n':
+                            alph_list.append(alph_str)
+                    alph_list1=self.no_repeat(alph_list)
+                    if len(alph_list1)==0:
+                        print("В файле алфавита нет подходящих значений/Пустой файл")            
+                return alph_list1
+            except Exception:
+                print("Ошибка в пути файла")
+            flag=False
+            break
 
     def no_repeat(self, alph_list):
         alph_list1=[]
@@ -112,7 +121,7 @@ class AbstractClass(ABC):
             if z not in alph_list1:
                 alph_list1.append(z)
         return alph_list1
-############################################################################
+#######################################################################################
 
 
 class ChangeEncrypt(AbstractClass):
@@ -182,14 +191,14 @@ class ChangeEncrypt(AbstractClass):
         flag1=True
         while flag1:
             key_fileway=self._create_file('key')    
-            self.alph_list=self.alp_open()
-            key_list=random.sample(self.alph_list, len(self.alph_list))
+            alph_list=self.alp_open()
+            key_list=random.sample(alph_list, len(alph_list))
             try:
                 with open(key_fileway, "x", encoding="utf-8") as key_file:
                     key_file.write('шифр замены')
                     i=0
-                    while i<len(self.alph_list):
-                        str0='\n' + self.alph_list[i] + ':' + key_list[i]
+                    while i<len(alph_list):
+                        str0='\n' + alph_list[i] + ':' + key_list[i]
                         key_file.write(str0)
                         i+=1
                     flag1==False
@@ -217,7 +226,7 @@ class ChangeEncrypt(AbstractClass):
                         key_dict[line[0]]=line[2]
         return key_dict
 
-#############################################################################
+#######################################################################################
 class ReplaceEncrypt(AbstractClass):
     def __init__(self):
         pass
@@ -271,7 +280,7 @@ class ReplaceEncrypt(AbstractClass):
     def decrypt(self, **args):
         key_list=self.read_key()
         len_key=len(key_list)
-        encrypt_list=self.read_encrypt(len_key)
+        encrypt_list=self._read_encrypt(len_key)
         len_encrypt=len(encrypt_list)
         flag1=True
         while flag1:
@@ -306,14 +315,9 @@ class ReplaceEncrypt(AbstractClass):
         flag=True
         while flag:
             try:
-                flag1=True
-                while flag1:
-                    len_key=int(input("Введите длину ключа: "))
-                    if len_key<2:
-                        print("Слишком короткий ключ")
-                    else:
-                        flag1==False
-                        break
+                len_key=int(input("Введите длину ключа: "))
+                if len_key<2:
+                    print("Слишком короткий ключ")
                 key_list=[x for x in range(1, len_key+1)]
                 random.shuffle(key_list)
                 key_fileway=self._create_file('key')
@@ -328,11 +332,11 @@ class ReplaceEncrypt(AbstractClass):
                         print("\nУспешно")
                         break
             except Exception():
-                print("Ошибка ввода")        
+                print("Возникла ошибка")        
        
         
 
-    def read_encrypt(self, len_key):
+    def _read_encrypt(self, len_key):
         encrypt_file=open(self.encrypt_open('шифр перестановки'),'r', encoding='utf-8' )
         encrypt_list=[]
         i=0
@@ -355,32 +359,130 @@ class ReplaceEncrypt(AbstractClass):
                     key_list=list(line)    
         return key_list
 
-###############################################################################
+#######################################################################################
 class GammEncrypt(AbstractClass):
     def __init__(self):
         pass
 
     def encrypt(self, **args):
         text_list=self.text_open()
-        print(text_list)
+        key_list, gamma=self._read_key()
+        alph_list=self.alp_open()
+        while len(text_list)%gamma!=0:
+            text_list.append(random.choice(text_list))
+        len_text=len(text_list)
+        len_alph=len(alph_list)
+        flag1=True
+        while flag1:
+            with open(self._create_file('encrypt'),'w', encoding='utf-8') as encrypt_file:
+                encrypt_file.write('шифр гаммирования\n')
+                i=0
+                k=0
+                str0=''
+                while len(str0) != len_text:
+                    if k<len_alph:
+                        if  text_list[i]==alph_list[k]:
+                            key_val=int(key_list[i%gamma])
+                            encrypt_val=(k+key_val)%len_alph
+                            str0=str0 + f'{alph_list[encrypt_val]}'
+                            print(str0, i, k)
+                            i+=1
+                            k=0
+                        else:
+                            k+=1
+                    else:
+                        str0=str0+text_list[i]
+                        print(str0, i, k)
+                        i+=1
+                        k=0
+                encrypt_file.write(str0)
+                flag1=False
+                break
+        
         
 
     def decrypt(self, **args):
-        pass
+        encrypt_list=self._read_encrypt()
+        key_list, gamma=self._read_key()
+        alph_list=self.alp_open()
+        len_encrypt=len(encrypt_list)
+        len_alph=len(alph_list)
+        flag1=True
+        while flag1:
+            with open(self._create_file('txt'),'w', encoding='utf-8') as decrypt_file:
+                i=0
+                k=0
+                str0=''
+                while len(str0) != len_encrypt:
+                    if k<len_alph:
+                        if  encrypt_list[i]==alph_list[k]:
+                            key_val=int(key_list[i%gamma])
+                            encrypt_val=(k-key_val+len_alph)%len_alph
+                            str0=str0 + f'{alph_list[encrypt_val]}'
+                            print(str0, i, k)
+                            i+=1
+                            k=0
+                        else:
+                            k+=1
+                    else:
+                        str0=str0+encrypt_list[i]
+                        print(str0, i, k)
+                        i+=1
+                        k=0
+                decrypt_file.write(str0)
+                flag1=False
+                break
 
     def gen_key(self, **args):
-        alph_list=self.alp_open()
-        len_alph=len(alph_list)
-        len_crypt=int(input("Введите длину блока: "))
-        print(len_alph-len_crypt)
-    
+        flag=True
+        while flag:
+            try:
+                gamma=0
+                while gamma<2:
+                    gamma=int(input("Введите гамму: "))
+                    if gamma<2:
+                        print("Слишком маленькое значение гаммы")
+                key_list=[i+1 for i in range(gamma)]
+                random.shuffle(key_list)
+                key_file=open(self._create_file('key'),'w',encoding='utf-8')
+                key_file.write('шифр гамирования\n')
+                i=0
+                str0=''
+                while i<len(key_list):                   
+                    str0=str0 + str(key_list[i]) + ' '
+                    i+=1
+                str0=str0.rstrip(' ')
+                key_file.write(str0)
+                flag==False
+                print("\nУспешно")
+                break
+            except Exception():
+                print("Возникла ошибка")
+        
+
+        
     def _read_encrypt(self):
-        encrypt_filename=self.encrypt_open('шифр гамирования')
-        print(encrypt_filename)
+        encrypt_file=open(self.encrypt_open('шифр гаммирования'),'r', encoding='utf-8' )
+        encrypt_list=[]
+        i=0
+        for line in encrypt_file:
+            if i<1:
+                i+=1
+            else:
+                encrypt_list.extend(list(line))
+        return encrypt_list
 
     def _read_key(self):
-        key_filename=self.key_open('шифр гамирования')
-        print(key_filename)
+        key_file=open(self.key_open('шифр гамирования'),'r', encoding='utf-8')
+        key_list=[]
+        i=0
+        for line in key_file:
+            if i<1:
+                i+=1
+            else:
+                key_list=line.split(' ')
+        print(key_list)
+        return key_list, len(key_list)
 
 
 change=ChangeEncrypt()
@@ -397,7 +499,7 @@ while flag:
             \n3) Сгенерировать ключ\n4) Выйти из программы\nВыбор: "))
         if choice==1:       
             while flag2:
-                choice1=int(input("\nВыберите метод шифровки:\n\n1) Метод замены\
+                choice1=int(input("\nВыберите метод шифровки:\n \n1) Метод замены\
                     \n2) Метод перестановки\n3) Метод гамирования\n4)Вернуться в главное меню\nВыбор: "))
                 if choice1!=1 and choice1!=2 and choice1!=3 and choice1!=4:
                     print("Ошибка ввода")
@@ -413,7 +515,7 @@ while flag:
 
         elif choice==2:     
             while flag2:
-                choice1=int(input("\nВыберите метод расшифровки:\n\n1) Метод замены\
+                choice1=int(input("\nВыберите метод расшифровки:\n \n1) Метод замены\
                     \n2) Метод перестановки\n3) Метод гамирования\n4)Вернуться в главное меню\nВыбор: "))
                 if choice1!=1 and choice1!=2 and choice1!=3 and choice1!=4:
                     print("Ошибка ввода")
@@ -429,7 +531,7 @@ while flag:
                 
         elif choice==3:     
             while flag2:
-                choice1=int(input("\nСгенерировать ключ для следующего алгоритма: \n\n1) Шифр замены\
+                choice1=int(input("\nСгенерировать ключ для следующего алгоритма: \n \n1) Шифр замены\
                     \n2) Шифр перестановки\n3) Шифр гамирования\n4) Вернуться в главное меню\nВыбор: "))
                 if choice1!=1 and choice1!=2 and choice1!=3 and choice1!=4:
                     print("Ошибка ввода")
@@ -452,12 +554,12 @@ while flag:
         print("Wrong command")
     except TypeError:
         print("Ошибка типа переменной")
-        '''except UnboundLocalError:
-        print("UnboundLocalError")'''
+    except UnboundLocalError:
+        print("UnboundLocalError")
     except FileNotFoundError:
         print("File not found")
         '''except IndexError:
         print("IndexError")'''
     except ValueError:
-        print("ValueError")                     
+        print("ValueError")    
     
