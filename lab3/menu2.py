@@ -91,9 +91,11 @@ class AbstractClass(ABC):
                 else:
                     print("Файл ключа для другого метода")    
                 if len(key_list)!=0:
-                    return way
+                    flag=False
+                    break
                 else:
                     print("Пустой файл")
+        return way
 
     def _alp_open(self):
         flag=True
