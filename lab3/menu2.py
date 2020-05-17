@@ -111,6 +111,8 @@ class AbstractClass(ABC):
                             alph_list.append(alph_str)
                         elif len(alph_str)!=1:
                             alph_str.strip(' ')
+                            if len(alph_str)==1:
+                                alph_list.append(alph_str)
                     for z in alph_list:
                         if z not in alph_list1:
                             alph_list1.append(z)
