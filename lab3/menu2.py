@@ -49,52 +49,69 @@ class AbstractClass(ABC):
             
 
     def _text_open(self):
-        way=self._test_way('txt')
-        with open(way, "r", encoding="utf-8") as text_file:
-            text_list=[]
-            for line in text_file:
-                text_list.extend(list(line))
-            if len(text_list)!=0:
-                return text_list
-            else:
-                print("Пустой файл")
+        flag=True
+        while flag:
+            try:
+                way=self._test_way('txt')
+                with open(way, "r", encoding="utf-8") as text_file:
+                    text_list=[]
+                    for line in text_file:
+                        text_list.extend(list(line))
+                    if len(text_list)!=0:
+                        flag=False
+                        break
+                    else:
+                        print("Пустой файл")
+            except Exception:
+                print("Ошибка в хз чем")
+        return text_list
 
     def _encrypt_open(self, crypt):
-        way=self._test_way('encrypt')
-        with open(way, "r", encoding="utf-8") as encrypt_file:
-            encrypt_list=[]
-            for line in encrypt_file:
-                key_str=line.rstrip('\n')
-                encrypt_list.append(key_str)
-            if encrypt_list[0]==crypt:
-                encrypt_list.clear()
-            else:
-                print("Файл шифротекста для другого метода")
-            str0=list(line)
-            encrypt_list.extend(str0)
-            if len(encrypt_list)!=0:
-                return way
-            else:
-                print("Пустой файл")
+        flag=True
+        while flag:
+            try:
+                way=self._test_way('encrypt')
+                with open(way, "r", encoding="utf-8") as encrypt_file:
+                    encrypt_list=[]
+                    for line in encrypt_file:
+                        key_str=line.rstrip('\n')
+                        encrypt_list.append(key_str)
+                    if encrypt_list[0]==crypt:
+                        encrypt_list.clear()
+                    else:
+                        print("Файл шифротекста для другого метода")
+                    str0=list(line)
+                    encrypt_list.extend(str0)
+                    if len(encrypt_list)!=0:
+                        flag=False
+                        break
+                    else:
+                        print("Пустой файл")
+            except Exception:
+                print("Ошибка в хз чем")
+        return way
 
     def _key_open(self, crypt):
         flag=True
         while flag:
-            way=self._test_way('key')
-            with open(way, "r", encoding="utf-8") as key_file:
-                key_list=[]
-                for line in key_file:
-                    key_str=line.rstrip('\n')
-                    key_list.append(key_str)
-                if key_list[0]==crypt:
-                    pass
-                else:
-                    print("Файл ключа для другого метода")    
-                if len(key_list)!=0:
-                    flag=False
-                    break
-                else:
-                    print("Пустой файл")
+            try:
+                way=self._test_way('key')
+                with open(way, "r", encoding="utf-8") as key_file:
+                    key_list=[]
+                    for line in key_file:
+                        key_str=line.rstrip('\n')
+                        key_list.append(key_str)
+                    if key_list[0]==crypt:
+                        if len(key_list)!=0:
+                            flag=False
+                            break
+                        else:
+                            print("Пустой файл")
+                    else:
+                        print("Файл ключа для другого метода")    
+                    
+            except Exception:
+                print("Ошибка в хз чем")
         return way
 
     def _alp_open(self):
@@ -120,7 +137,7 @@ class AbstractClass(ABC):
                         print("В файле алфавита нет подходящих значений/Пустой файл")            
                 return alph_list1
             except Exception:
-                print("Ошибка в пути файла")
+                print("Ошибка в хз чем")
             flag=False
             break
 #######################################################################################
