@@ -24,13 +24,14 @@ class AbstractClass(ABC):
             way=input(f"Введите путь к {file} файлу: ")
             try:
                 if way.endswith(f".{file}"):
-                    return way
+                    flag=False
+                    break
                 else:
                     print("Неправильный тип файла")
             except Exception:
                 print("Ошибка в пути файла")
-            flag=False
-            break
+        return way
+            
 
     def _create_file(self, file):
         flag=True
@@ -38,13 +39,14 @@ class AbstractClass(ABC):
             try:
                 way=input(f"Введите путь для создания файла {file}: ")
                 if way.endswith(f".{file}"):
-                    return way
+                    flag=False
+                    break
                 else:
                     print("Неправильный тип файла")
             except Exception:
                 print("Ошибка в пути файла")
-            flag=False
-            break
+        return way
+            
 
     def _text_open(self):
         way=self._test_way('txt')
@@ -67,7 +69,7 @@ class AbstractClass(ABC):
             if encrypt_list[0]==crypt:
                 encrypt_list.clear()
             else:
-                print("Файл ключа для другого метода")
+                print("Файл шифротекста для другого метода")
             str0=list(line)
             encrypt_list.extend(str0)
             if len(encrypt_list)!=0:
@@ -76,20 +78,22 @@ class AbstractClass(ABC):
                 print("Пустой файл")
 
     def _key_open(self, crypt):
-        way=self._test_way('key')
-        with open(way, "r", encoding="utf-8") as key_file:
-            key_list=[]
-            for line in key_file:
-                key_str=line.rstrip('\n')
-                key_list.append(key_str)
-            if key_list[0]==crypt:
-                pass
-            else:
-                print("Файл ключа для другого метода")    
-            if len(key_list)!=0:
-                return way
-            else:
-                print("Пустой файл")
+        flag=True
+        while flag:
+            way=self._test_way('key')
+            with open(way, "r", encoding="utf-8") as key_file:
+                key_list=[]
+                for line in key_file:
+                    key_str=line.rstrip('\n')
+                    key_list.append(key_str)
+                if key_list[0]==crypt:
+                    pass
+                else:
+                    print("Файл ключа для другого метода")    
+                if len(key_list)!=0:
+                    return way
+                else:
+                    print("Пустой файл")
 
     def _alp_open(self):
         flag=True
@@ -103,6 +107,8 @@ class AbstractClass(ABC):
                         alph_str=line.rstrip('\n')
                         if len(alph_str)==1 and line[0]!='\n':
                             alph_list.append(alph_str)
+                        elif len(alph_str)!=1:
+                            alph_str.strip(' ')
                     for z in alph_list:
                         if z not in alph_list1:
                             alph_list1.append(z)
@@ -240,7 +246,6 @@ class ReplaceEncrypt(AbstractClass):
                             if int(key_list[x])==k%len_key+1:
                                 block_lict.pop(x)
                                 block_lict.insert(x, text_list[i])
-                                print(block_lict)
                                 flag1=False
                                 break
                             else:
@@ -249,7 +254,6 @@ class ReplaceEncrypt(AbstractClass):
                         if p==len_key:
                             for z in range(len_key):
                                 str0=str0+f'{block_lict[z]}'
-                                print(str0)
                             block_lict=[None]*len_key
                             p=0
                     encrypt_file.write(str0)
@@ -277,12 +281,10 @@ class ReplaceEncrypt(AbstractClass):
                             if (x+1)==int(key_list[k]):
                                 block_lict.pop(x)
                                 block_lict.insert(x, encrypt_list[i])
-                                print(block_lict)
                         p+=1
                         if p==len_key:
                             for z in range(len_key):
                                 str0=str0+f'{block_lict[z]}'
-                                print(str0)
                             block_lict=[None]*len_key
                             p=0
                     decrypt_file.write(str0)
@@ -293,9 +295,11 @@ class ReplaceEncrypt(AbstractClass):
         flag=True
         while flag:
             try:
-                len_key=int(input("Введите длину ключа: "))
-                if len_key<2:
-                    print("Слишком короткий ключ")
+                len_key=0
+                while len_key<2:
+                    len_key=int(input("Введите длину ключа: "))
+                    if len_key<2:
+                        print("Слишком короткий ключ")
                 key_list=[x for x in range(1, len_key+1)]
                 random.shuffle(key_list)
                 key_fileway=self._create_file('key')
@@ -303,7 +307,7 @@ class ReplaceEncrypt(AbstractClass):
                         i=0
                         str0=''
                         while i<len(key_list):                   
-                            str0=str0 + str(key_list[i])
+                            str0=str0 + str(key_list[i]) + ' '
                             i+=1 
                         key_file.write(str0)
                         flag==False
@@ -334,7 +338,7 @@ class ReplaceEncrypt(AbstractClass):
                     i+=1
                     pass
                 elif i==1:
-                    key_list=list(line)    
+                    key_list=list(line.split(' '))    
         return key_list
 
 #######################################################################################
@@ -363,14 +367,12 @@ class GammEncrypt(AbstractClass):
                             key_val=int(key_list[i%gamma])
                             encrypt_val=(k+key_val)%len_alph
                             str0=str0 + f'{alph_list[encrypt_val]}'
-                            print(str0, i, k)
                             i+=1
                             k=0
                         else:
                             k+=1
                     else:
                         str0=str0+text_list[i]
-                        print(str0, i, k)
                         i+=1
                         k=0
                 encrypt_file.write(str0)
@@ -397,14 +399,12 @@ class GammEncrypt(AbstractClass):
                             key_val=int(key_list[i%gamma])
                             encrypt_val=(k-key_val+len_alph)%len_alph
                             str0=str0 + f'{alph_list[encrypt_val]}'
-                            print(str0, i, k)
                             i+=1
                             k=0
                         else:
                             k+=1
                     else:
                         str0=str0+encrypt_list[i]
-                        print(str0, i, k)
                         i+=1
                         k=0
                 decrypt_file.write(str0)
@@ -459,7 +459,6 @@ class GammEncrypt(AbstractClass):
                 i+=1
             else:
                 key_list=line.split(' ')
-        print(key_list)
         return key_list, len(key_list)
 
 
@@ -558,12 +557,12 @@ while flag:
         print("Wrong command")
     except KeyboardInterrupt:
         pass
+    except OSError:
+        print("Введен некорректный путь")
     except TypeError:
         print("Ошибка типа переменной")
     except UnboundLocalError:
         print("UnboundLocalError")
-    except FileNotFoundError:
-        print("File not found")
     except IndexError:
         print("IndexError")
     except ValueError:
