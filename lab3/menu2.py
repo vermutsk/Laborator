@@ -207,8 +207,15 @@ class ChangeEncrypt(AbstractClass):
                     flag1==False
                     print("\nУспешно")
                     break 
-            except FileExistsError:
-                    print("Файл с таким именем уже существует")
+            except ValueError:
+                print("Недопустимый символ")
+                er+=1
+                if er>2:
+                    print("Слишком много ошибок")
+                    flag=False
+                    break
+            except Exception:
+                print("Возникла ошибка")
 
     def __read_encrypt(self):
         encrypt_file=open(self._encrypt_open('шифр замены'),'r', encoding='utf-8' )
