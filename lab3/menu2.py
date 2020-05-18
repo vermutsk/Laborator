@@ -74,15 +74,15 @@ class AbstractClass(ABC):
                         encrypt_list.append(key_str)
                     if encrypt_list[0]==crypt:
                         encrypt_list.clear()
+                        str0=list(line)
+                        encrypt_list.extend(str0)
+                        if len(encrypt_list)!=0:
+                            flag=False
+                            break
+                        else:
+                            print("Пустой файл")
                     else:
-                        print("Файл шифротекста для другого метода")
-                    str0=list(line)
-                    encrypt_list.extend(str0)
-                    if len(encrypt_list)!=0:
-                        flag=False
-                        break
-                    else:
-                        print("Пустой файл")
+                        print("Файл шифротекста для другого метода")        
             except Exception:
                 print("Возникла ошибка")
         return way
@@ -151,14 +151,16 @@ class ChangeEncrypt(AbstractClass):
                 with open(encrypt_way,'x', encoding='utf-8') as encrypt_file:
                     encrypt_file.write('шифр замены\n')
                     str0=''
-                    for k in range(len(text_list)): 
-                        for key, value in key_dict.items():   
-                            if text_list[k]==value:
-                                print(text_list[k]) 
-                                str0=str0+f'{key}'
-                            else:
+                    for k in range(len(text_list)):
+                        i=0 
+                        for key, value in key_dict.items():
+                            i+=1   
+                            if text_list[k]==key: 
+                                str0=str0+f'{value}'
+                                break
+                            elif i==len(key_dict):
                                 str0=str0+f'{text_list[k]}'
-                                break          
+                                break                      
                     encrypt_file.write(str0)
                     print("\nУспешно")        
                 flag=False
@@ -176,11 +178,13 @@ class ChangeEncrypt(AbstractClass):
                 with open(text_way,'x', encoding='utf-8') as text_file:
                     str0=''
                     for k in range(len(encrypt_list)): 
-                        for key, value in key_dict.items():   
+                        i=0
+                        for key, value in key_dict.items():
+                            i+=1   
                             if encrypt_list[k]==value:
-                                print(encrypt_list[k]) 
                                 str0=str0+f'{key}'
-                            else:
+                                break
+                            elif i==len(key_dict):
                                 str0=str0+f'{encrypt_list[k]}'
                                 break          
                     text_file.write(str0)
@@ -207,13 +211,6 @@ class ChangeEncrypt(AbstractClass):
                     flag1==False
                     print("\nУспешно")
                     break 
-            except ValueError:
-                print("Недопустимый символ")
-                er+=1
-                if er>2:
-                    print("Слишком много ошибок")
-                    flag=False
-                    break
             except Exception:
                 print("Возникла ошибка")
 
@@ -252,25 +249,24 @@ class ReplaceEncrypt(AbstractClass):
             text_list.append(random.choice(text_list))
         len_text=len(text_list)
         
-        flag1=True
-        while flag1:
-            encrypt_way=self._create_file('encrypt')
-            with open(encrypt_way,'x', encoding='utf-8') as encrypt_file:
-                encrypt_file.write('шифр перестановки\n')
-                str0='' 
-                flag=True
-                k=0
-                p=0
-                while flag:
+        flag=True
+        while flag:
+            try:
+                encrypt_way=self._create_file('encrypt')
+                with open(encrypt_way,'x', encoding='utf-8') as encrypt_file:
+                    encrypt_file.write('шифр перестановки\n')
+                    str0=''
+                    k=0
+                    p=0
                     block_lict=[None]*len_key
                     for i in range(len_text):
-                        k+=1
                         x=0
                         flag1=True
                         while flag1:
                             if int(key_list[x])==k%len_key+1:
                                 block_lict.pop(x)
                                 block_lict.insert(x, text_list[i])
+                                k+=1
                                 flag1=False
                                 break
                             else:
@@ -284,7 +280,9 @@ class ReplaceEncrypt(AbstractClass):
                     encrypt_file.write(str0)
                     print("\nУспешно")
                     flag=False
-                    break      
+                    break
+            except Exception:
+                print("Возникла ошибка")  
 
     def decrypt(self, **args):
         key_list=self.__read_key()
@@ -293,20 +291,26 @@ class ReplaceEncrypt(AbstractClass):
         len_encrypt=len(encrypt_list)
         flag1=True
         while flag1:
-            decrypt_way=self._create_file('txt')
-            with open(decrypt_way,'x', encoding='utf-8') as decrypt_file:
-                str0='' 
-                flag=True
-                k=0
-                p=0
-                while flag:
+            try:
+                decrypt_way=self._create_file('txt')
+                with open(decrypt_way,'x', encoding='utf-8') as decrypt_file:
+                    str0=''
+                    k=0
+                    p=0
                     block_lict=[None]*len_key
                     for i in range(len_encrypt):
-                        k=(k+1)%len_key
-                        for x in range(len_key):
-                            if (x+1)==int(key_list[k]):
-                                block_lict.pop(x)
-                                block_lict.insert(x, encrypt_list[i])
+                        x=0
+                        flag=True
+                        while flag:
+                            for x in range(len_key):
+                                if (x+1)==int(key_list[k]):
+                                    block_lict.pop(x)
+                                    block_lict.insert(x, encrypt_list[i])
+                                    k=(k+1)%len_key
+                                    flag=False
+                                    break
+                                else:
+                                    x+=1
                         p+=1
                         if p==len_key:
                             for z in range(len_key):
@@ -315,8 +319,10 @@ class ReplaceEncrypt(AbstractClass):
                             p=0
                     decrypt_file.write(str0)
                     print("\nУспешно")
-                    flag=False
-                    break 
+                    flag1=False
+                    break
+            except Exception:
+                print("Возникла ошибка") 
 
     def gen_key(self, **args):
         flag=True
@@ -372,7 +378,8 @@ class ReplaceEncrypt(AbstractClass):
                     i+=1
                     pass
                 elif i==1:
-                    key_list=list(line.split(' '))    
+                    line=line.rstrip(' ')
+                    key_list=line.split(' ')    
         return key_list
 
 #######################################################################################
@@ -388,29 +395,32 @@ class GammEncrypt(AbstractClass):
         len_alph=len(alph_list)
         flag1=True
         while flag1:
-            with open(self._create_file('encrypt'),'x', encoding='utf-8') as encrypt_file:
-                encrypt_file.write('шифр гаммирования\n')
-                i=0
-                k=0
-                str0=''
-                while len(str0) != len_text:
-                    if k<len_alph:
-                        if  text_list[i]==alph_list[k]:
-                            key_val=int(key_list[i%gamma])
-                            encrypt_val=(k+key_val)%len_alph
-                            str0=str0 + f'{alph_list[encrypt_val]}'
+            try:
+                with open(self._create_file('encrypt'),'x', encoding='utf-8') as encrypt_file:
+                    encrypt_file.write('шифр гаммирования\n')
+                    i=0
+                    k=0
+                    str0=''
+                    while len(str0) != len_text:
+                        if k<len_alph:
+                            if  text_list[i]==alph_list[k]:
+                                key_val=int(key_list[i%gamma])
+                                encrypt_val=(k+key_val)%len_alph
+                                str0=str0 + f'{alph_list[encrypt_val]}'
+                                i+=1
+                                k=0
+                            else:
+                                k+=1
+                        else:
+                            str0=str0+text_list[i]
                             i+=1
                             k=0
-                        else:
-                            k+=1
-                    else:
-                        str0=str0+text_list[i]
-                        i+=1
-                        k=0
-                encrypt_file.write(str0)
-                print("\nУспешно")
-                flag1=False
-                break       
+                    encrypt_file.write(str0)
+                    print("\nУспешно")
+                    flag1=False
+                    break
+            except Exception:
+                print("Возникла ошибка")       
 
     def decrypt(self, **args):
         encrypt_list=self.__read_encrypt()
@@ -420,28 +430,31 @@ class GammEncrypt(AbstractClass):
         len_alph=len(alph_list)
         flag1=True
         while flag1:
-            with open(self._create_file('txt'),'x', encoding='utf-8') as decrypt_file:
-                i=0
-                k=0
-                str0=''
-                while len(str0) != len_encrypt:
-                    if k<len_alph:
-                        if  encrypt_list[i]==alph_list[k]:
-                            key_val=int(key_list[i%gamma])
-                            encrypt_val=(k-key_val+len_alph)%len_alph
-                            str0=str0 + f'{alph_list[encrypt_val]}'
+            try:
+                with open(self._create_file('txt'),'x', encoding='utf-8') as decrypt_file:
+                    i=0
+                    k=0
+                    str0=''
+                    while len(str0) != len_encrypt:
+                        if k<len_alph:
+                            if  encrypt_list[i]==alph_list[k]:
+                                key_val=int(key_list[i%gamma])
+                                encrypt_val=(k-key_val+len_alph)%len_alph
+                                str0=str0 + f'{alph_list[encrypt_val]}'
+                                i+=1
+                                k=0
+                            else:
+                                k+=1
+                        else:
+                            str0=str0+encrypt_list[i]
                             i+=1
                             k=0
-                        else:
-                            k+=1
-                    else:
-                        str0=str0+encrypt_list[i]
-                        i+=1
-                        k=0
-                decrypt_file.write(str0)
-                print("\nУспешно")
-                flag1=False
-                break
+                    decrypt_file.write(str0)
+                    print("\nУспешно")
+                    flag1=False
+                    break
+            except Exception:
+                print("Возникла ошибка")
 
     def gen_key(self, **args):
         flag=True
@@ -603,5 +616,5 @@ while flag:
     except IndexError:
         print("IndexError")
     except ValueError:
-        print("ValueError")    
+        print("ValueError") 
     
