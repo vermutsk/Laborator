@@ -607,8 +607,6 @@ while flag:
         print("SyntaxError")
     except KeyboardInterrupt:
         pass
-    except OSError:
-        print("Введен некорректный путь")
     except TypeError:
         print("TypeError")
     except UnboundLocalError:
