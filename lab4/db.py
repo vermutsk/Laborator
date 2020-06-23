@@ -47,7 +47,7 @@ def create_akk():
         except Exception:
             pass  
 
-def write_bd(login):
+def write_bd(login:str):
     password = input("Введите пароль\n")
     hash_salt = sec.hash_password(password)
     flag = True
@@ -105,7 +105,7 @@ def authentication():
         sec.security_sys_files(bd_way)
         print("Ошибка")
 
-def delete_akk(access):
+def delete_akk(access:str):
     way = os.getcwd()
     bd_way = os.path.join(way, 'bd.txt')
     start_file(bd_way)
@@ -145,7 +145,7 @@ def delete_akk(access):
         i+=1
         print("Ошибка удаления")
     
-def change_keys(access):
+def change_keys(access:str):
     way = os.getcwd()
     dir_way = os.path.join(way, access)
     os.chdir(access)
@@ -171,7 +171,7 @@ def change_keys(access):
     print("Ключ шифрования успешно изменен")
     
     
-def start_file(bd_way):
+def start_file(bd_way:str):
     try:
         sec.decode_sys_files(bd_way)
         flag = 0
