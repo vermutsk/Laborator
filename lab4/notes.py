@@ -1,33 +1,101 @@
-#########работа с заметками
-import hashlib
-pip install pycryptodomex
-#### https://python-scripts.com/encryption-cryptography ########
-###Требования:
-###
-###1. Программа должна хранить служебную информацию на диске, в зашифрованном виде.
-###
-###2. Программа должна хранить пользовательскую информацию в зашифрованном виде.
-###
-###3. Для шифрования служебной информации можно применять ключ, хранящийся в программе.
-###
-###4. В вашей программе могут работать несколько различных пользователей.
-###
-###5. Для работы в вашей программе пользователь сначала должен либо зарегистрироваться, либо аутентифицироваться.
-###
-###6. В системе НЕ может быть несколько пользователей с одним логином.
-###
-###7. Пользователь НЕ должен получать доступ к чужим заметкам.
-###
-###8. Информация о пользователях хранится в базе.
-###
-###9. Система НЕ хранит пароль от аккаунта пользователя, хранится лишь вычисленный хэш от пароля и соли.
-###
-###10. Шифрование содержимого файлов заметок осуществляется с применением сгенерированного программой секретного ключа.
-###
-###11. Ключ шифрования у каждого пользователя свой.
-###
-###12. Ключ шифрования хранится в базе в зашифрованном виде. Шифрование ключа осуществляется с применением мастер-ключа, созданного на основе пароля пользователя. Мастер-ключ создается алгоритмом PBKDF2 на основе hmac.
-###
-###13. Все шифрования производятся алгоритмом AES в режиме CBC с длинной ключа 256 бит (32 байта).
-###
-###14. Хеш вычисляется по алгоритму SHA256.
+import os
+import glob
+import subprocess 
+from sys import platform
+from time import sleep
+import security as sec
+
+def create_note(dir_name):
+    flag = 0
+    while flag < 3:
+        try:
+            way_note = sys_prog(dir_name)
+            note_file = open(way_note,'x', encoding='utf-8')
+            note_file.close()
+            print("Заметка создана")
+            flag = 3
+            break
+        except FileExistsError:
+            flag +=1
+            print("Заметка с таким именем уже существует")
+        except Exception:
+            flag +=1
+            pass          
+
+def change_note(dir_name):
+    flag = 0
+    while flag < 3:
+        try:
+            way = os.getcwd()
+            way_note = sys_prog(dir_name)
+            start_file(way_note)
+            way_note = way_note.replace('\\','\\\\')
+            subprocess.call(f'notepad "{way_note}"')
+            sec.security_files(way, way_note)
+            print("Заметка изменена")
+            flag = 3
+            break
+        except FileNotFoundError:
+            flag +=1
+            print("Заметка не найдена")
+        except Exception:
+            flag +=1
+            print("Kosyak")    
+        
+def delete_note(dir_name):
+    flag = 0
+    while flag < 3:
+        try:
+            way_note = sys_prog(dir_name)
+            os.remove(way_note)
+            print("Заметка удалена")
+            flag = 3
+            break 
+        except FileNotFoundError:
+            flag +=1
+            print("Заметка не найдена")
+        except Exception:
+            flag +=1
+            pass
+
+def delete_all_notes(dir_name):
+    way = os.getcwd()
+    os.chdir(dir_name)
+    files = glob.glob('*.txt')
+    for f in files:
+        try:
+            os.unlink(f)
+        except OSError:
+            print("Ошибка")
+    print("Успешно")
+    os.chdir(way)
+
+def list_notes(dir_name):
+    way = os.getcwd()
+    os.chdir(dir_name)
+    files = glob.glob('*.txt')
+    for f in files:
+        f = f.rstrip('.txt')
+        print(f)
+    print("Успешно")
+    os.chdir(way)
+
+def sys_prog(dir_name):
+    if platform == "linux" or platform == "linux2":
+        slash = '/'
+    elif platform == "win32" or platform == "win64":
+        slash = '\\'
+    way = os.getcwd()
+    name_note = input("Введите название заметки:\n")
+    way_note = f'{way}{slash}{dir_name}{slash}{name_note}.txt'
+    return way_note
+
+def start_file(way_note):
+    try:
+        sec.decode_sys_files(way_note)
+    except Exception:
+        sec.security_sys_files(way_note)
+        sec.decode_sys_files(way_note)
+
+    
+
