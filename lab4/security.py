@@ -8,28 +8,28 @@ from Crypto.Cipher._mode_eax import EaxMode
 def publick():
     with open('rsa_public.pem','r',encoding='utf-8') as pub_key:
         file=pub_key.read()
-    file=file.encode("utf-8")
-    return file
+    file1=file.encode("utf-8")
+    return file1
 
 def private():
     with open('private_rsa_key.bin','r',encoding='utf-8') as priv_key:
         file=priv_key.read()
-    file=file.encode("utf-8")
-    return file
+    file1=file.encode("utf-8")
+    return file1
 
 def publick_ordinary(way:str):
     way_new=os.path.join(way,"rsa_public.pem")
     with open(way_new,'r',encoding='utf-8') as pub_key:
         file=pub_key.read()
-    file=file.encode("utf-8")
-    return file
+    file1=file.encode("utf-8")
+    return file1
 
 def private_ordinary(way:str):
     way_new=os.path.join(way,"Keys","private_rsa_key.bin")
     with open(way_new,'r',encoding='utf-8') as priv_key:
         file=priv_key.read()
-    file=file.encode("utf-8")
-    return file
+    file1=file.encode("utf-8")
+    return file1
 
 def check_password(hashed_password:str, user_password:str):
     password, salt = hashed_password.split(':')
