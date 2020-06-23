@@ -121,7 +121,7 @@ def decode_files(way:str,name_file:str):
         cipher_rsa = PKCS1_OAEP.new(private_key)
         session_key = cipher_rsa.decrypt(enc_session_key)
 
-        cipher_aes: EaxMode = AES.new(session_key, AES.MODE_EAX,nonce)# type: ignore
+        cipher_aes: EaxMode = AES.new(session_key, AES.MODE_EAX,nonce)
         data = cipher_aes.decrypt_and_verify(ciphertext, tag)
     with open(name_file,'wb') as out_file:
         out_file.write(data)
@@ -142,7 +142,7 @@ def decode_sys_files(name_file:str):
         cipher_rsa = PKCS1_OAEP.new(private_key)
         session_key = cipher_rsa.decrypt(enc_session_key)
 
-        cipher_aes: EaxMode = AES.new(session_key, AES.MODE_EAX,nonce)# type: ignore
+        cipher_aes: EaxMode = AES.new(session_key, AES.MODE_EAX,nonce)
         data = cipher_aes.decrypt_and_verify(ciphertext, tag)
     with open(name_file,'wb') as out_file:
         out_file.write(data)
