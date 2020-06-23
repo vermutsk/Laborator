@@ -5,7 +5,7 @@ from sys import platform
 from time import sleep
 import security as sec
 
-def create_note(dir_name):
+def create_note(dir_name:str):
     flag = 0
     while flag < 3:
         try:
@@ -22,7 +22,7 @@ def create_note(dir_name):
             flag +=1
             pass          
 
-def change_note(dir_name):
+def change_note(dir_name:str):
     flag = 0
     while flag < 3:
         try:
@@ -42,7 +42,7 @@ def change_note(dir_name):
             flag +=1
             print("Kosyak")    
         
-def delete_note(dir_name):
+def delete_note(dir_name:str):
     flag = 0
     while flag < 3:
         try:
@@ -58,7 +58,7 @@ def delete_note(dir_name):
             flag +=1
             pass
 
-def delete_all_notes(dir_name):
+def delete_all_notes(dir_name:str):
     way = os.getcwd()
     os.chdir(dir_name)
     files = glob.glob('*.txt')
@@ -70,7 +70,7 @@ def delete_all_notes(dir_name):
     print("Успешно")
     os.chdir(way)
 
-def list_notes(dir_name):
+def list_notes(dir_name:str):
     way = os.getcwd()
     os.chdir(dir_name)
     files = glob.glob('*.txt')
@@ -80,7 +80,7 @@ def list_notes(dir_name):
     print("Успешно")
     os.chdir(way)
 
-def sys_prog(dir_name):
+def sys_prog(dir_name:str):
     if platform == "linux" or platform == "linux2":
         slash = '/'
     elif platform == "win32" or platform == "win64":
@@ -90,7 +90,7 @@ def sys_prog(dir_name):
     way_note = f'{way}{slash}{dir_name}{slash}{name_note}.txt'
     return way_note
 
-def start_file(way_note):
+def start_file(way_note:str):
     try:
         sec.decode_sys_files(way_note)
     except Exception:
