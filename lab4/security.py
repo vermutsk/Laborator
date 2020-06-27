@@ -37,13 +37,13 @@ def check_password(hashed_password:str, user_password:str):
 
 
 def hash_password(password:str):
-    salt ="zakharchenko.dvfu@.ru"
-    salt_b=b"zakharchenko.dvfu@.ru"
+    salt ="eyafjallajokulll"
+    salt_b=b"eyafjallajokulll"
     return hashlib.sha256(salt_b + password.encode('utf-8')).hexdigest() + ':' + salt
 
 
 def generate_keys(way:str):
-    code = 'booooooobs'
+    code = 'helphelphe'
     key = RSA.generate(1024)
 
     encrypted_key = key.exportKey(
@@ -107,7 +107,7 @@ def security_sys_files(name_file:str):
 
 
 def decode_files(way:str,name_file:str):
-    code = 'booooooobs'
+    code = 'helphelphe'
     with open(name_file, 'rb') as fobj:
         private_key = RSA.import_key(
             private_ordinary(way),
@@ -128,7 +128,7 @@ def decode_files(way:str,name_file:str):
 
 
 def decode_sys_files(name_file:str):
-    code = 'booooooobs'
+    code = 'helphelphe'
     with open(name_file, 'rb') as fobj:
         private_key = RSA.import_key(
             private(),
