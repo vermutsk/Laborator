@@ -69,19 +69,17 @@ def read_files()->list:
         else: c=True
         list_123[i]=(a+b+c)%2
     list_4=[False]*len(list_123)
-    for id, x in enumerate(list_123):
+    for index, x in enumerate(list_123):
         if x==1:
-            if id%5==0:
+            if index%5==0:
                 pass
             else:
-                list_4[id]=id
+                list_4[index]=index
     for x in range(5, int(math.sqrt(len(list_123)))):
         if list_4[x]:
             for y in range(x ** 2, limit + 1, x ** 2):
                 list_4[y] = False
     return list_4
-
-
 
 if __name__ == '__main__':
     try:
@@ -105,7 +103,7 @@ if __name__ == '__main__':
         while len(time_list)>limit:
             time_list.pop()
         result=list()
-        for index,elem in enumerate(time_list):
+        for index, elem in enumerate(time_list):
             if elem is not False:
                 result.append(elem)
         result.sort()
