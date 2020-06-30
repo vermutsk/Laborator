@@ -81,15 +81,7 @@ def read_files()->list:
                 list_4[y] = False
     return list_4
 
-def starts(limit: int):
-    with mp.Pool(processes=3) as my_pool:
-        p1 = my_pool.starmap(atkin,
-                             iterable=[
-                                       [limit, 1],
-                                       [limit, 2],
-                                       [limit, 3]
-                                      ],
-                             )
+
 
 if __name__ == '__main__':
     try:
@@ -101,18 +93,25 @@ if __name__ == '__main__':
             raise Exception
         limit = int(argv[1])
         a = timeit.default_timer()
-        starts(limit)
+        with mp.Pool(processes=3) as my_pool:
+            p = my_pool.starmap(atkin,
+                                iterable=[
+                                          [limit, 1],
+                                          [limit, 2],
+                                          [limit, 3]
+                                         ],
+                                )
         time_list = read_files()
         while len(time_list)>limit:
             time_list.pop()
-        res=list()
+        result=list()
         for index,elem in enumerate(time_list):
             if elem is not False:
-                res.append(elem)
-        res.sort()
+                result.append(elem)
+        result.sort()
         with open("result.txt", "w", encoding='utf-8') as file:
             file.write("2\n3\n5\n")
-            for p in res:
+            for p in result:
                 string = ""+str(p)+"\n"
                 file.write(string)
         print(f"Алгоритм считал:{timeit.default_timer()-a}секунд\n")
@@ -121,4 +120,4 @@ if __name__ == '__main__':
     except Exception:
         print("Неправильный аргумент")
     except BaseException:
-        print("Вы нажали на Ctrl + C")
+        print("^C")
