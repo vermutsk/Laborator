@@ -25,7 +25,7 @@ def publick_ordinary(way:str):
     return file1
 
 def private_ordinary(way:str):
-    way_new=os.path.join(way,"Keys","private_rsa_key.bin")
+    way_new=os.path.join(way, "private_rsa_key.bin")
     with open(way_new,'r',encoding='utf-8') as priv_key:
         file=priv_key.read()
     file1=file.encode("utf-8")
@@ -35,12 +35,10 @@ def check_password(hashed_password:str, user_password:str):
     password, salt = hashed_password.split(':')
     return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
 
-
 def hash_password(password:str):
     salt ="eyafjallajokulll"
     salt_b=b"eyafjallajokulll"
     return hashlib.sha256(salt_b + password.encode('utf-8')).hexdigest() + ':' + salt
-
 
 def generate_keys(way:str):
     code = 'helphelphe'
@@ -59,7 +57,6 @@ def generate_keys(way:str):
     with open(os.path.join(way,'private_rsa_key.bin'), 'wb') as file_key: 
         file_key.write(encrypted_key)
     security_sys_files(os.path.join(way,'private_rsa_key.bin')) 
- 
 
 def security_files(way:str,name_file:str):
     data: bytes=b''
@@ -82,7 +79,6 @@ def security_files(way:str,name_file:str):
         out_file.write(tag)
         out_file.write(ciphertext)
 
-
 def security_sys_files(name_file:str):
     data:bytes=b''
     with open(name_file,'rb') as some_file:
@@ -103,8 +99,6 @@ def security_sys_files(name_file:str):
         out_file.write(cipher_aes.nonce)
         out_file.write(tag)
         out_file.write(ciphertext)
-
-
 
 def decode_files(way:str,name_file:str):
     code = 'helphelphe'
