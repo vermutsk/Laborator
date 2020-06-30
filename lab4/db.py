@@ -167,18 +167,17 @@ def change_keys(access:str):
             sec.security_sys_files(note_way)
         except OSError:
             print("Ошибка")
-    print("Ключ шифрования успешно изменен")
-    
+    print("Ключ шифрования успешно изменен") 
     
 def start_file(bd_way:str):
     try:
         sec.decode_sys_files(bd_way)
         flag = 0
-    except ValueError:
+    except FileNotFoundError:
+        flag = 3
+    except Exception:
         sec.security_sys_files(bd_way)
         sec.decode_sys_files(bd_way)
         flag = 0
-    except FileNotFoundError:
-        flag = 3
     return flag
 
