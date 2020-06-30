@@ -32,7 +32,7 @@ def atkin(limit: int, number: int):
             n = 3 * x ** 2 - y ** 2
             if x > y and n <= limit and n % 12 == 11:
                 sieve[n] = not sieve[n]
-            if int(time.time())-t>10:
+            if int(time.time())-t>5:
                 print(x)
                 t=time.time()
                 t=int(t)
