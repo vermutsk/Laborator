@@ -96,8 +96,7 @@ def authentication():
             if login != login1:
                 print("Данный пользователь не найден")
             if flag == 3:
-                print("Слишком много попыток")
-            
+                print("Слишком много попыток")        
     except FileNotFoundError:
         sec.security_sys_files(bd_way)
         print("Создайте аккаунт")
