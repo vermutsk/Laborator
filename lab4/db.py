@@ -152,22 +152,24 @@ def change_keys(access:str):
     for f in files:
         note_way = os.path.join(dir_way, f)
         try:
-            start_file(note_way)
-        except ValueError:
-            pass
-        except OSError:
-            print("Ошибка")
+            sec.decode_files(way, note_way)
+        except Exception:
+            sec.security_files(way, note_way)
+            sec.decode_files(way, note_way)
     os.chdir(way)
     os.remove(os.path.join(dir_way, 'private_rsa_key.bin'))
     os.remove(os.path.join(dir_way, 'rsa_public.pem'))
     sec.generate_keys(dir_way)
+    os.chdir(access)
+    files = glob.glob('*.txt')
     for f in files:
         note_way = os.path.join(dir_way, f)
         try:
-            sec.security_sys_files(note_way)
+            sec.security_files(way, note_way)
         except OSError:
             print("Ошибка")
-    print("Ключ шифрования успешно изменен") 
+    print("Ключ шифрования успешно изменен")
+    os.chdir(way) 
     
 def start_file(bd_way:str):
     try:
