@@ -28,7 +28,7 @@ def change_note(dir_name:str):
         try:
             way = os.getcwd()
             way_note = sys_prog(dir_name)
-            start_file(way_note)
+            start_file(way, way_note)
             way_note = way_note.replace('\\','\\\\')
             subprocess.call(f'notepad "{way_note}"')
             sec.security_files(way, way_note)
@@ -90,12 +90,12 @@ def sys_prog(dir_name:str):
     way_note = f'{way}{slash}{dir_name}{slash}{name_note}.txt'
     return way_note
 
-def start_file(way_note:str):
+def start_file(way:str, way_note:str):
     try:
-        sec.decode_sys_files(way_note)
+        sec.decode_files(way, way_note)
     except Exception:
-        sec.security_sys_files(way_note)
-        sec.decode_sys_files(way_note)
+        sec.security_files(way, way_note)
+        sec.decode_files(way, way_note)
 
     
 
