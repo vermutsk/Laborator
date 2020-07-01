@@ -6,21 +6,11 @@ from sys import argv
 import multiprocessing as mp
 
 def atkin(limit: int, number: int):
-    if number == 1:
-        way = "first.txt"
-        status = "1 процесс завершил работу"
-        i=1
-    elif number == 2:
-        way = "second.txt"
-        status = "2 процесс завершил работу"
-        i=2
-    elif number == 3:
-        way = "third.txt"
-        status = "3 процесс завершил работу"
-        i=3
+    print(f"{number} процесс начал работу")
+    way = f"{number}.txt"
+    status = f"{number} процесс завершил работу"
+    i=number
     sieve = [False] * (limit+1)
-    t=time.time()
-    t=int(t)
     for x in range(i, int(math.sqrt(limit)) + 1, 3):
         for y in range(1, int(math.sqrt(limit)) + 1):
             n = 4 * x ** 2 + y ** 2
@@ -32,32 +22,28 @@ def atkin(limit: int, number: int):
             n = 3 * x ** 2 - y ** 2
             if x > y and n <= limit and n % 12 == 11:
                 sieve[n] = not sieve[n]
-            if int(time.time())-t>5:
-                print(x)
-                t=time.time()
-                t=int(t)
     with open(way, "w", encoding='utf-7') as file_atkin:
         for x in sieve:
             string = str(x) + '\n'
             file_atkin.write(string)
     print(status + '\n')
 
-def read_files()->list:
+def read_files():
     print("start read 1")
-    with open('first.txt','r',encoding='utf-8') as file_1:
+    with open('1.txt','r',encoding='utf-8') as file_1:
         first_read = file_1.read()
         list_1 = first_read.split("\n")
     print("start read 2")
-    with open('second.txt','r',encoding='utf-8') as file_2:
+    with open('2.txt','r',encoding='utf-8') as file_2:
             first_read = file_2.read()
             list_2 = first_read.split("\n")
     print("start read 3")
-    with open('third.txt','r',encoding='utf-8') as file_3:
+    with open('3.txt','r',encoding='utf-8') as file_3:
         first_read = file_3.read()
         list_3 = first_read.split("\n")
     list_123=[False]*len(list_1)
-    lens=len(list_1)
-    for i in range(0,lens):
+    len_list=len(list_1)
+    for i in range(0,len_list):
         if list_1[i]=="False":
             a=False
         else: a=True
@@ -110,12 +96,12 @@ if __name__ == '__main__':
         with open("result.txt", "w", encoding='utf-8') as file:
             file.write("2\n3\n5\n")
             for p in result:
-                string = ""+str(p)+"\n"
+                string = ''+str(p)+"\n"
                 file.write(string)
-        print(f"Алгоритм считал:{timeit.default_timer()-a}секунд\n")
+        print(f"Время работы:{timeit.default_timer()-a}сек\n")
     except FileNotFoundError:
         pass
     except Exception:
-        print("Неправильный аргумент")
+        print("Ошибка")
     except BaseException:
         print("^C")
