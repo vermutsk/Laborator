@@ -81,13 +81,9 @@ def list_notes(dir_name:str):
     os.chdir(way)
 
 def sys_prog(dir_name:str):
-    if platform == "linux" or platform == "linux2":
-        slash = '/'
-    elif platform == "win32" or platform == "win64":
-        slash = '\\'
     way = os.getcwd()
     name_note = input("Введите название заметки:\n")
-    way_note = f'{way}{slash}{dir_name}{slash}{name_note}.txt'
+    way_note = os.path.join(way, dir_name, f"{name_note}.txt")
     return way_note
 
 def start_file(way:str, way_note:str):
