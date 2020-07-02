@@ -76,7 +76,6 @@ if __name__ == '__main__':
         else:
             raise Exception
         limit = int(argv[1])
-        a = timeit.default_timer()
         with mp.Pool(processes=3) as my_pool:
             p = my_pool.starmap(atkin,iterable=[[limit, 1],[limit, 2],[limit, 3]],)
         time_list = read_files()
@@ -92,7 +91,7 @@ if __name__ == '__main__':
             for i in result:
                 str0 = ''+str(i)+"\n"
                 file.write(str0)
-        print(f"Время работы:{timeit.default_timer()-a}сек\n")
+        print(f"Время работы:{timeit.default_timer()}сек\n")
     except FileNotFoundError:
         pass
     except Exception:
