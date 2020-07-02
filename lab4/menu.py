@@ -111,13 +111,13 @@ while flag:
     
     except KeyboardInterrupt:
         pass 
-    #except SyntaxError:
-    #    print("SyntaxError")
-    #except IndexError:
-    #    print("IndexError")
-    #except ValueError:
-    #    print("ValueError")
-    #except UnboundLocalError:
-    #    print("Возникла ошибка")
-    #except TypeError:
-    #    print("TypeError")                 
+    except SyntaxError:
+        print("SyntaxError")
+    except IndexError:
+        print("IndexError")
+    except ValueError:
+        print("ValueError")
+    except UnboundLocalError:
+        print("Возникла ошибка")
+    except TypeError:
+        print("TypeError")                 
