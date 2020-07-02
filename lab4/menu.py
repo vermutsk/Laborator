@@ -109,15 +109,15 @@ while flag:
                 flag=False
                 break
     
-    except SyntaxError:
-        print("SyntaxError")
     except KeyboardInterrupt:
-        pass
-    except IndexError:
-        print("IndexError")
-    except ValueError:
-        print("ValueError")
-    except UnboundLocalError:
-        print("Возникла ошибка")
-    except TypeError:
-        print("TypeError")                 
+        pass 
+    #except SyntaxError:
+    #    print("SyntaxError")
+    #except IndexError:
+    #    print("IndexError")
+    #except ValueError:
+    #    print("ValueError")
+    #except UnboundLocalError:
+    #    print("Возникла ошибка")
+    #except TypeError:
+    #    print("TypeError")                 
