@@ -76,8 +76,8 @@ if __name__ == '__main__':
         else:
             raise Exception
         limit = int(argv[1])
-        with mp.Pool(processes=3) as my_pool:
-            p = my_pool.starmap(atkin,iterable=[[limit, 1],[limit, 2],[limit, 3]],)
+        with mp.Pool(processes=3) as pool:
+            p = pool.starmap(atkin,iterable=[[limit, 1],[limit, 2],[limit, 3]],)
         time_list = read_files()
         while len(time_list)>limit:
             time_list.pop()
