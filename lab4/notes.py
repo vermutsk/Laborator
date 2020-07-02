@@ -90,8 +90,7 @@ def start_file(way:str, way_note:str):
     try:
         sec.decode_files(way, way_note)
     except Exception:
-        sec.security_files(way, way_note)
-        sec.decode_files(way, way_note)
+        pass
 
     
 
