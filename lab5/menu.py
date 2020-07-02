@@ -1,6 +1,5 @@
 import os
 import math
-import time
 import timeit
 from sys import argv
 import multiprocessing as mp
@@ -90,9 +89,9 @@ if __name__ == '__main__':
         result.sort()
         with open("result.txt", "w", encoding='utf-8') as file:
             file.write("2\n3\n5\n")
-            for p in result:
-                string = ''+str(p)+"\n"
-                file.write(string)
+            for i in result:
+                str0 = ''+str(i)+"\n"
+                file.write(str0)
         print(f"Время работы:{timeit.default_timer()-a}сек\n")
     except FileNotFoundError:
         pass
