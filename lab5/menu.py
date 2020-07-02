@@ -14,13 +14,13 @@ def atkin(limit: int, number: int):
     for x in range(i, int(math.sqrt(limit)) + 1, 3):
         for y in range(1, int(math.sqrt(limit)) + 1):
             n = 4 * x ** 2 + y ** 2
-            if n <= limit and (n % 12 == 1 or n % 12 == 5):
+            if n <= limit and n % 5 != 0 and (n % 12 == 1 or n % 12 == 5):
                 sieve[n] = not sieve[n]
             n = 3 * x ** 2 + y ** 2
-            if n <= limit and n % 12 == 7:
+            if n <= limit and n % 5 != 0 and n % 12 == 7:
                 sieve[n] = not sieve[n]
             n = 3 * x ** 2 - y ** 2
-            if x > y and n <= limit and n % 12 == 11:
+            if x > y and n <= limit and n % 5 != 0 and n % 12 == 11:
                 sieve[n] = not sieve[n]
     with open(way, "w", encoding='utf-7') as file_atkin:
         for x in sieve:
@@ -57,14 +57,15 @@ def read_files():
     list_4=[False]*len(list_123)
     for index, x in enumerate(list_123):
         if x==1:
-            if index%5==0:
-                pass
-            else:
-                list_4[index]=index
+            list_4[index]=index
     for x in range(5, int(math.sqrt(len(list_123)))):
         if list_4[x]:
             for y in range(x ** 2, limit + 1, x ** 2):
                 list_4[y] = False
+    way = os.getcwd()
+    os.unlink(os.path.join(way, "1.txt"))
+    os.unlink(os.path.join(way, "2.txt"))
+    os.unlink(os.path.join(way, "3.txt"))
     return list_4
 
 if __name__ == '__main__':
@@ -78,13 +79,7 @@ if __name__ == '__main__':
         limit = int(argv[1])
         a = timeit.default_timer()
         with mp.Pool(processes=3) as my_pool:
-            p = my_pool.starmap(atkin,
-                                iterable=[
-                                          [limit, 1],
-                                          [limit, 2],
-                                          [limit, 3]
-                                         ],
-                                )
+            p = my_pool.starmap(atkin,iterable=[[limit, 1],[limit, 2],[limit, 3]],)
         time_list = read_files()
         while len(time_list)>limit:
             time_list.pop()
