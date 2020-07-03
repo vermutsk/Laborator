@@ -21,7 +21,7 @@ def atkin(limit: int, number: int):
             n = 3 * x ** 2 - y ** 2
             if x > y and n <= limit and n % 5 != 0 and n % 12 == 11:
                 sieve[n] = not sieve[n]
-    with open(way, "w", encoding='utf-7') as file_atkin:
+    with open(way, "w", encoding='utf-8') as file_atkin:
         for x in sieve:
             string = str(x) + '\n'
             file_atkin.write(string)
