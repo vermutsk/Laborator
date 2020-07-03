@@ -2,8 +2,9 @@ import os
 import glob
 import random
 import security as sec
+from typing import Tuple
 
-def create_akk():
+def create_akk()->None:
     flag = True
     er=0
     while flag:
@@ -45,9 +46,9 @@ def create_akk():
             flag = False
             break
         except Exception:
-            pass  
+            print("Ошибка") 
 
-def write_bd(login:str):
+def write_bd(login:str)->Tuple[str, str]:
     password = input("Введите пароль\n")
     hash_salt = sec.hash_password(password)
     flag = True
@@ -62,7 +63,7 @@ def write_bd(login:str):
     str0 = f'{login}|{hash_salt}|{dir_name}\n'
     return str0, dir_name       
 
-def authentication():
+def authentication()->str:
     try:
         flag = 0
         way = os.getcwd()
@@ -103,8 +104,9 @@ def authentication():
     except Exception:
         sec.security_sys_files(bd_way)
         print("Ошибка")
+    assert False
 
-def delete_akk(access:str):
+def delete_akk(access:str)->None:
     way = os.getcwd()
     bd_way = os.path.join(way, 'bd.txt')
     start_file(bd_way)
@@ -144,7 +146,7 @@ def delete_akk(access:str):
         i+=1
         print("Ошибка удаления")
     
-def change_keys(access:str):
+def change_keys(access:str)->None:
     way = os.getcwd()
     dir_way = os.path.join(way, access)
     os.chdir(access)
@@ -171,7 +173,7 @@ def change_keys(access:str):
     print("Ключ шифрования успешно изменен")
     os.chdir(way) 
     
-def start_file(bd_way:str):
+def start_file(bd_way:str)->int:
     try:
         sec.decode_sys_files(bd_way)
         flag = 0
