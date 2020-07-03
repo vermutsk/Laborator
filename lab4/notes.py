@@ -1,3 +1,4 @@
+#python -m mypy --strict . проверка муру
 import os
 import glob
 import subprocess 
@@ -5,7 +6,7 @@ from sys import platform
 from time import sleep
 import security as sec
 
-def create_note(dir_name:str):
+def create_note(dir_name:str)->None:
     flag = 0
     while flag < 3:
         try:
@@ -22,7 +23,7 @@ def create_note(dir_name:str):
             flag +=1
             pass          
 
-def change_note(dir_name:str):
+def change_note(dir_name:str)->None:
     flag = 0
     while flag < 3:
         try:
@@ -42,7 +43,7 @@ def change_note(dir_name:str):
             flag +=1
             print("Kosyak")    
         
-def delete_note(dir_name:str):
+def delete_note(dir_name:str)->None:
     flag = 0
     while flag < 3:
         try:
@@ -58,7 +59,7 @@ def delete_note(dir_name:str):
             flag +=1
             pass
 
-def delete_all_notes(dir_name:str):
+def delete_all_notes(dir_name:str)->None:
     way = os.getcwd()
     os.chdir(dir_name)
     files = glob.glob('*.txt')
@@ -70,7 +71,7 @@ def delete_all_notes(dir_name:str):
     print("Успешно")
     os.chdir(way)
 
-def list_notes(dir_name:str):
+def list_notes(dir_name:str)->None:
     way = os.getcwd()
     os.chdir(dir_name)
     files = glob.glob('*.txt')
@@ -80,13 +81,13 @@ def list_notes(dir_name:str):
     print("Успешно")
     os.chdir(way)
 
-def sys_prog(dir_name:str):
+def sys_prog(dir_name:str)->str:
     way = os.getcwd()
     name_note = input("Введите название заметки:\n")
     way_note = os.path.join(way, dir_name, f"{name_note}.txt")
     return way_note
 
-def start_file(way:str, way_note:str):
+def start_file(way:str, way_note:str)->None:
     try:
         sec.decode_files(way, way_note)
     except Exception:
