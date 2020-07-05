@@ -22,6 +22,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1121, 770)
+        
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
@@ -45,10 +46,8 @@ class Ui_MainWindow(object):
                             'code -52', 'code -42', 'code -21', 'code -40', ' code -44', 'code -46', ' code -38']
         self.tableWidget.setHorizontalHeaderLabels(self.column_label)
         
-        
-
         self.PathFile = QLineEdit(self.centralwidget)
-        self.PathFile.setGeometry(QRect(200, 10, 831, 31))
+        self.PathFile.setGeometry(QRect(200, 10, 831, 90))
         self.PathFile.setObjectName("PathFile")
 
         self.progressBar_2 = QProgressBar(MainWindow)
@@ -122,7 +121,7 @@ class Ui_MainWindow(object):
         self.comboBox.setPlaceholderText("")
         self.saveButt.setText(QCoreApplication.translate("MainWindow", "Сохранить данные", None))
         self.OpenButt.setText(QCoreApplication.translate("MainWindow", "Выбрать папку", None))
-        self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить", None))
+        self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить парамметры", None))
         self.AnalizButt.setText(QCoreApplication.translate("MainWindow", "Анализировать", None))
         self.change_sizeLine.setPlaceholderText(QCoreApplication.translate("MainWindow", "1-1000", None))
         self.change_sizeButt.setText(QCoreApplication.translate("MainWindow", u"Изменить выборку", None))
