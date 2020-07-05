@@ -18,6 +18,7 @@ class SyncObj(QObject):
     progressBarUpdated_2 = Signal(int)
     tableUpdatedRow = Signal((int, int, list))
     tableUpdatedHeader = Signal(int)
+syns = SyncObj()
 
 class Win(QMainWindow):
     def __init__(self, parent=None):
@@ -32,9 +33,7 @@ class Win(QMainWindow):
         self.ui.OpenButt.clicked.connect(self.openButt)
         self.ui.AnalizButt.clicked.connect(self.analizButt)
         self.ui.change_cbButt.clicked.connect(self.change_cb_index)
-
         self.ui.change_sizeButt.clicked.connect(self.change_size)
-
         self.ui.saveButt.clicked.connect(self.save_Data)
         self.my_pool = mp.Pool(1)
         self.callback_obj = SyncObj()
@@ -51,23 +50,32 @@ class Win(QMainWindow):
             if size == '':
                 miim = 0
                 maam = 999
+                self.ui.change_sizeLine.setToolTip('')
             elif len(size)>2 and size.find('-') != -1 and size.count('-')==1:
                 size = size.split('-')
                 miim0 = size[0]
                 maam0 = size[1]
                 try:
-                    if int(miim0)<int(maam0) and int(miim0)>0:
-                        self.ui.change_sizeLine.setToolTip('')
-                        miim = int(miim0)-1
-                        maam = int(maam0)-1
+                    if int(miim0)<int(maam0) and int(miim0)>=0 and int(maam0)<11000:
+                        if int(maam0) - int(miim0) <= 10000:
+                            if int(miim0)>0:
+                                self.ui.change_sizeLine.setToolTip('')
+                                #self.ui.centralwidget.setStyleSheet("change_sizeLine { background-color: white }")
+                                miim = int(miim0)-1
+                                maam = int(maam0)-1
+                            elif int(miim0)==0:
+                                self.ui.change_sizeLine.setToolTip('')
+                                miim = int(miim0)
+                                maam = int(maam0)
+                        else:
+                            self.ui.change_sizeLine.setToolTip('Ошибка: слишком большой интервал')
+                            self.setStyleSheet("change_sizeLine { background-color: red }")
                     else:
                         self.ui.change_sizeLine.setToolTip('Ошибка: min > max')
                 except Exception:
-                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения') 
-                    print(miim, maam)   
+                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения')   
             else:
                 self.ui.change_sizeLine.setToolTip('Ошибка: введите в виде "int-int"')
-        print(miim, maam)
         return miim, maam
         
     def openButt(self):
@@ -97,18 +105,22 @@ class Win(QMainWindow):
         if self.data_array != []:
             self.login_array.clear()
         miim, maam = self.change_size()
-
         self.UpdateTableHeader(solo_data[0])
         value = 0
+        value1 = 0
+        step = 100/maam
+        step1 = 100/(len(solo_data)-maam)
         self.ui.tableWidget.setRowCount(0)
         for i, row in enumerate(solo_data[1:]):
-            value += 1
+            value += step
             self.callback_obj.progressBarUpdated.emit(value)
-            print(value)
             if miim <= i <= maam:
                 self.callback_obj.tableUpdatedRow.emit(i, miim, row)
-        self.callback_obj.progressBarUpdated.emit(value + 1)
+            if i >= maam:
+                value1 += step1
+                self.callback_obj.progressBarUpdated_2.emit(value1)
         self.callback_obj.progressBarUpdated.emit(0)
+        self.callback_obj.progressBarUpdated_2.emit(0)
         self.save_array = list.copy(solo_data)
         self.unlocker()
         self.chek = True
@@ -166,40 +178,44 @@ class Win(QMainWindow):
         if self.chek:
             d_t, ok = QInputDialog.getText(self, "Ввод даты и времени", "Введите дату и время для поиска:", QLineEdit.Normal,'YYYY.MM.DD HH:MM:SS')
             if ok and d_t:
-                d_t = d_t.split(' ')
-                age = d_t[0]
-                clock = d_t[1]
-                age = age.split('.')
-                clock = clock.split(':')
-                unix_time = datetime.datetime(int(age[0]), int(age[1]), int(age[2]), int(clock[0]), int(clock[1]),
-                                              int(clock[2])).timestamp()
-                unix_time = int(unix_time)
-                unix_time += (36000)
-                unix_time = str(unix_time)
-                if unix_time in self.data_array:
-                    self.data_array.clear()
-                    self.ui.tableWidget.setRowCount(0)
-                    self.UpdateTableHeader(self.save_array[0])
-                    p = 0
-                    value = 0
-                    for row in self.save_array[1:]:
-                        value += 1
-                        self.callback_obj.progressBarUpdated.emit(value)
-                        if unix_time == row[0]:
-                            self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
-                            for j, v in enumerate(row):
-                                if j == 3:
-                                    self.login_array.append(v)
-                                it = QTableWidgetItem()
-                                it.setData(Qt.DisplayRole, v)
-                                self.ui.tableWidget.setItem(p, j, it)
-                            p += 1
-                    self.callback_obj.progressBarUpdated.emit(value + 1)
-                    self.callback_obj.progressBarUpdated.emit(0)
-                    self.unlocker()
-                    pass
+                if d_t.count('.')==2 and d_t.count(':')==2 and d_t.count(' ')==1:
+                    d_t = d_t.split(' ')
+                    age = d_t[0]
+                    clock = d_t[1]
+                    age = age.split('.')
+                    clock = clock.split(':')
+                    if age.isdigit()==True and clock.isdigit()==True:
+                        unix_time = datetime.datetime(int(age[0]), int(age[1]), int(age[2]), int(clock[0]), int(clock[1]),
+                                                      int(clock[2])).timestamp()
+                        unix_time = int(unix_time)
+                        unix_time += (36000)
+                        unix_time = str(unix_time)
+                        if unix_time in self.data_array:
+                            self.data_array.clear()
+                            self.ui.tableWidget.setRowCount(0)
+                            self.UpdateTableHeader(self.save_array[0])
+                            p = 0
+                            value = 0
+                            for row in self.save_array[1:]:
+                                value += 1
+                                self.callback_obj.progressBarUpdated.emit(value)
+                                if unix_time == row[0]:
+                                    self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
+                                    for j, v in enumerate(row):
+                                        if j == 3:
+                                            self.login_array.append(v)
+                                        it = QTableWidgetItem()
+                                        it.setData(Qt.DisplayRole, v)
+                                        self.ui.tableWidget.setItem(p, j, it)
+                                    p += 1
+                            self.callback_obj.progressBarUpdated.emit(value + 1)
+                            self.callback_obj.progressBarUpdated.emit(0)
+                            self.unlocker()
+                    else:
+                        QMessageBox.about(self, 'Ошибка', 'Неправильный формат данных')
+                        self.unlocker()
                 else:
-                    QMessageBox.about(self, 'Ошибка', 'Дата и время не найдены')
+                    QMessageBox.about(self, 'Ошибка', 'Неправильный формат данных')
                     self.unlocker()
             else:
                 QMessageBox.about(self, 'Ошибка', 'Введите дату и время')
@@ -233,7 +249,6 @@ class Win(QMainWindow):
                     p = self.ui.tableWidget.item(i, j).text()
                     save.append(p)
                 writher.writerow(save)
-        self.callback_obj.progressBarUpdated.emit(value + 1)
         self.callback_obj.progressBarUpdated.emit(0)
         self.unlocker()
 
@@ -274,23 +289,21 @@ class Win(QMainWindow):
         self.ui.change_cbButt.setDisabled(False)
         self.ui.OpenButt.setDisabled(False)
         self.ui.change_sizeButt.setDisabled(False)
-        self.ui.change_sizeLine.setDisabled(True)
+        self.ui.change_sizeLine.setDisabled(False)
 
 
 def read_ddir(csv_files):
-    all_data = []
+    files = []
     for i in range(len(csv_files)):
-        with open(csv_files[i], 'r')as csv_file:
+        with open(csv_files[i], 'r') as csv_file:
             reader = csv.reader(csv_file)
             data = list(reader)
-        all_data.append(data)
-    solo_data = list.copy(all_data[0])
-    for i in range(1, len(all_data)):
-        all_data[i].remove(all_data[i][0])
-        solo_data += all_data[i]
-    print(len(solo_data))
+        files.append(data)
+    solo_data = list.copy(files[0])
+    for i in range(1, len(files)):
+        files[i].remove(files[i][0])
+        solo_data += files[i]
     return solo_data
-
 
 
 if __name__ == "__main__":
