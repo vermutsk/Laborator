@@ -3,6 +3,7 @@ import sys
 import csv
 import datetime
 import multiprocessing as mp
+from widget import Ui_MainWindow
 from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject, Signal,
     QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
@@ -11,10 +12,10 @@ from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
 from PySide2.QtWidgets import (QScrollArea, QWidget, QTableView, QPushButton,
     QProgressBar, QComboBox, QApplication, QMainWindow, QAbstractItemView, 
     QMessageBox, QTableWidgetItem, QFileDialog, QInputDialog, QLineEdit)
-from widget import Ui_MainWindow
 
 class SyncObj(QObject):
     progressBarUpdated = Signal(int)
+    progressBarUpdated_2 = Signal(int)
     tableUpdatedRow = Signal((int, int, list))
     tableUpdatedHeader = Signal(int)
 
@@ -31,14 +32,44 @@ class Win(QMainWindow):
         self.ui.OpenButt.clicked.connect(self.openButt)
         self.ui.AnalizButt.clicked.connect(self.analizButt)
         self.ui.change_cbButt.clicked.connect(self.change_cb_index)
-        #self.ui.serchData.clicked.connect(self.serch_Data)
+
+        self.ui.change_sizeButt.clicked.connect(self.change_size)
+
         self.ui.saveButt.clicked.connect(self.save_Data)
         self.my_pool = mp.Pool(1)
         self.callback_obj = SyncObj()
         self.callback_obj.progressBarUpdated.connect(self.ui.progressBar.setValue)
+        self.callback_obj.progressBarUpdated_2.connect(self.ui.progressBar_2.setValue)
         self.callback_obj.tableUpdatedRow.connect(self.UpdateTableRow)
         self.callback_obj.tableUpdatedHeader.connect(self.UpdateTableHeader)
 
+    def change_size(self):
+        miim = 0
+        maam = 999
+        if self.chek:
+            size = self.ui.change_sizeLine.text()
+            if size == '':
+                miim = 0
+                maam = 999
+            elif len(size)>2 and size.find('-') != -1 and size.count('-')==1:
+                size = size.split('-')
+                miim0 = size[0]
+                maam0 = size[1]
+                try:
+                    if int(miim0)<int(maam0) and int(miim0)>0:
+                        self.ui.change_sizeLine.setToolTip('')
+                        miim = int(miim0)-1
+                        maam = int(maam0)-1
+                    else:
+                        self.ui.change_sizeLine.setToolTip('Ошибка: min > max')
+                except Exception:
+                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения') 
+                    print(miim, maam)   
+            else:
+                self.ui.change_sizeLine.setToolTip('Ошибка: введите в виде "int-int"')
+        print(miim, maam)
+        return miim, maam
+        
     def openButt(self):
         fileD = QFileDialog()
         open_file = fileD.getExistingDirectory(self)
@@ -60,13 +91,12 @@ class Win(QMainWindow):
         self.ui.tableWidget.setHorizontalHeaderLabels(row)
 
     def set_data(self, solo_data):
+        self.locker()
         if self.data_array != []:
             self.data_array.clear()
         if self.data_array != []:
             self.login_array.clear()
-        miim = 0
-        maam = 99
-        print(self.data_array)
+        miim, maam = self.change_size()
 
         self.UpdateTableHeader(solo_data[0])
         value = 0
@@ -74,10 +104,9 @@ class Win(QMainWindow):
         for i, row in enumerate(solo_data[1:]):
             value += 1
             self.callback_obj.progressBarUpdated.emit(value)
+            print(value)
             if miim <= i <= maam:
                 self.callback_obj.tableUpdatedRow.emit(i, miim, row)
-
-
         self.callback_obj.progressBarUpdated.emit(value + 1)
         self.callback_obj.progressBarUpdated.emit(0)
         self.save_array = list.copy(solo_data)
@@ -86,7 +115,6 @@ class Win(QMainWindow):
 
     def change_cb_index(self):
         id = self.ui.comboBox.currentIndex()
-        print(id)
         if id ==1:
             self.serch_Login()
         elif id == 2:
@@ -105,7 +133,7 @@ class Win(QMainWindow):
                     self.UpdateTableHeader(self.save_array[0])
                     p = 0
                     value = 0
-                    for i, row in enumerate(self.save_array[1:]):
+                    for row in self.save_array[1:]:
                         value += 1
                         self.callback_obj.progressBarUpdated.emit(value)
                         if login in row:
@@ -136,14 +164,14 @@ class Win(QMainWindow):
         if self.login_array != []:
             self.login_array.clear()
         if self.chek:
-            d_t, ok = QInputDialog.getText(self, "Ввод даты и времени", "Введите дату и время для поиска:\nФормат YYYY.MM.DD HH:MM:SS", QLineEdit.Normal,'')
+            d_t, ok = QInputDialog.getText(self, "Ввод даты и времени", "Введите дату и время для поиска:", QLineEdit.Normal,'YYYY.MM.DD HH:MM:SS')
             if ok and d_t:
                 d_t = d_t.split(' ')
                 age = d_t[0]
                 clock = d_t[1]
                 age = age.split('.')
                 clock = clock.split(':')
-                unix_time = datetime.datetime(int(age[2]), int(age[1]), int(age[0]), int(clock[0]), int(clock[1]),
+                unix_time = datetime.datetime(int(age[0]), int(age[1]), int(age[2]), int(clock[0]), int(clock[1]),
                                               int(clock[2])).timestamp()
                 unix_time = int(unix_time)
                 unix_time += (36000)
@@ -154,7 +182,7 @@ class Win(QMainWindow):
                     self.UpdateTableHeader(self.save_array[0])
                     p = 0
                     value = 0
-                    for i, row in enumerate(self.save_array[1:]):
+                    for row in self.save_array[1:]:
                         value += 1
                         self.callback_obj.progressBarUpdated.emit(value)
                         if unix_time == row[0]:
@@ -237,54 +265,32 @@ class Win(QMainWindow):
         self.ui.saveButt.setDisabled(True)
         self.ui.change_cbButt.setDisabled(True)
         self.ui.OpenButt.setDisabled(True)
+        self.ui.change_sizeButt.setDisabled(True)
+        self.ui.change_sizeLine.setDisabled(True)
 
     def unlocker(self):
         self.ui.AnalizButt.setDisabled(False)
         self.ui.saveButt.setDisabled(False)
         self.ui.change_cbButt.setDisabled(False)
         self.ui.OpenButt.setDisabled(False)
+        self.ui.change_sizeButt.setDisabled(False)
+        self.ui.change_sizeLine.setDisabled(True)
 
 
 def read_ddir(csv_files):
     all_data = []
     for i in range(len(csv_files)):
         with open(csv_files[i], 'r')as csv_file:
-            reader = csv.reader(csv_file)  # reader - список списков
+            reader = csv.reader(csv_file)
             data = list(reader)
         all_data.append(data)
     solo_data = list.copy(all_data[0])
     for i in range(1, len(all_data)):
         all_data[i].remove(all_data[i][0])
         solo_data += all_data[i]
+    print(len(solo_data))
     return solo_data
 
-#class TadleWidgetWindow(object):
-#    def setapUi(self, MainWindow):
-#        MainWindow.setObjectName("MainWindow")
-#        MainWindow.resize(600, 600)
-#        self.centralWidget = QWidget(MainWindow)
-#        self.centralWidget.resize(500, 500)
-#        vbox = QVBoxLayout(self.centralWidget)
-#        self.TabletWidget = QTableWidget()
-#        vbox.addWidget(self.TabletWidget)
-#        self.TabletWidget.setColumnCount(17)
-#        list1 = ['1', '2', '3', '4']
-#        l = [i for i in range(len(list1))]#Длина списка
-#        self.TabletWidget.setRowCount(l) 
-#        self.column_label = ['begin', 'end', 'time interval', 'login', 'mac ab','ULSK1',\
-#                            'BRAS ip', ', start count', 'alive count', 'stop count', \
-#                            'incoming', 'outcoming', 'error_count','code 0', 'code 1011',\
-#                             'code 1100', 'code -3', 'code -52', 'code -42', 'code -21', \
-#                             ', code -40', 'code -44', 'code -46', 'code -38']
-#        self.row_label = l
-#        self.TabletWidget.HorizontalHeaderLadels(self.column_label)
-#        self.TabletWidget.VerticalHeaderLadels(self.row_label)
-#        self.TabletWidget.setSortingEnabled(True)
-#
-#class MainWindow(QMainWindow, TadleWidgetWindow):
-#    def __init__(self, parent=None, *args, **kwargs):
-#        QMainWindow.__init__(self)
-#        self.setupUi(self)
 
 
 if __name__ == "__main__":
