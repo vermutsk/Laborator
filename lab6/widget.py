@@ -14,7 +14,7 @@ from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
     QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter,
     QPixmap, QRadialGradient)
 from PySide2.QtWidgets import (QScrollArea, QWidget, QTableWidget, QPushButton,
-    QProgressBar, QComboBox, QLineEdit)
+    QProgressBar, QComboBox, QLineEdit, QDateTimeEdit)
 
 
 class Ui_MainWindow(object):
@@ -22,7 +22,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1121, 770)
-        
+
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
@@ -65,16 +65,22 @@ class Ui_MainWindow(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.setGeometry(QRect(20, 690, 301, 28))
+        self.comboBox.setGeometry(QRect(20, 690, 161, 28))
         self.comboBox.setEditable(False)
         self.comboBox.setDuplicatesEnabled(False)
 
+        self.dateTimeEdit = QDateTimeEdit(MainWindow)
+        self.dateTimeEdit.setObjectName("dateTimeEdit")
+        self.dateTimeEdit.setGeometry(QRect(190, 690, 151, 28))
+        self.dateTimeEdit.setCurrentSection(QDateTimeEdit.DaySection)
+        
+
         self.saveButt = QPushButton(self.centralwidget)
-        self.saveButt.setGeometry(QRect(20, 610, 301, 28))
+        self.saveButt.setGeometry(QRect(20, 610, 321, 28))
         self.saveButt.setObjectName("saveButt")
 
         self.AnalizButt = QPushButton(self.centralwidget)
-        self.AnalizButt.setGeometry(QRect(20, 570, 301, 28))
+        self.AnalizButt.setGeometry(QRect(20, 570, 321, 28))
         self.AnalizButt.setObjectName("AnalizButt")
         
         self.OpenButt = QPushButton(self.centralwidget)
@@ -83,7 +89,7 @@ class Ui_MainWindow(object):
 
         self.change_cbButt = QPushButton(self.centralwidget)
         self.change_cbButt.setObjectName("change_cbButt")
-        self.change_cbButt.setGeometry(QRect(20, 730, 301, 28))
+        self.change_cbButt.setGeometry(QRect(20, 730, 321, 28))
 
         self.change_sizeButt = QPushButton(self.centralwidget)
         self.change_sizeButt.setObjectName(u"change_sizeButt")
@@ -91,7 +97,7 @@ class Ui_MainWindow(object):
 
         self.change_sizeLine = QLineEdit(self.centralwidget)
         self.change_sizeLine.setObjectName("change_sizeLine")
-        self.change_sizeLine.setGeometry(QRect(190, 650, 131, 28))
+        self.change_sizeLine.setGeometry(QRect(190, 650, 151, 28))
 
         self.OpenButt.raise_()
         self.AnalizButt.raise_()
@@ -101,6 +107,7 @@ class Ui_MainWindow(object):
         self.tableWidget.raise_()
         self.saveButt.raise_()
         self.comboBox.raise_()
+        self.dateTimeEdit.raise_()
         self.change_sizeButt.raise_()
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -119,6 +126,7 @@ class Ui_MainWindow(object):
         self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", "Выборка по дате", None))
         self.comboBox.setCurrentText(QCoreApplication.translate("MainWindow", "\u041f\u043e\u043b\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a", None))
         self.comboBox.setPlaceholderText("")
+        self.dateTimeEdit.setDisplayFormat(QCoreApplication.translate("MainWindow", "dd.MM.yyyy H:mm:ss"))
         self.saveButt.setText(QCoreApplication.translate("MainWindow", "Сохранить данные", None))
         self.OpenButt.setText(QCoreApplication.translate("MainWindow", "Выбрать папку", None))
         self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить парамметры", None))
