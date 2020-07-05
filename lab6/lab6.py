@@ -18,7 +18,6 @@ class SyncObj(QObject):
     progressBarUpdated_2 = Signal(int)
     tableUpdatedRow = Signal((int, int, list))
     tableUpdatedHeader = Signal(int)
-syns = SyncObj()
 
 class Win(QMainWindow):
     def __init__(self, parent=None):
@@ -42,6 +41,62 @@ class Win(QMainWindow):
         self.callback_obj.tableUpdatedRow.connect(self.UpdateTableRow)
         self.callback_obj.tableUpdatedHeader.connect(self.UpdateTableHeader)
 
+    def openButt(self):
+        fileD = QFileDialog()
+        open_file = fileD.getExistingDirectory(self)
+        self.ui.PathFile.setText('')
+        self.ui.PathFile.setText(open_file)
+
+    def analizButt(self):
+        self.locker()
+        path_file = self.ui.PathFile.text()
+        if os.path.exists(path_file) is False:
+            QMessageBox.about(self, 'Ошибка', 'Введите путь')
+            self.ui.PathFile.setText('')
+            self.unlocker()
+            return 2
+        list_dir = os.listdir(path_file)
+        csv_files = []
+        for i in range(len(list_dir)):
+            get_path = os.path.join(path_file, list_dir[i])
+            chek = os.path.isfile(get_path)
+            if chek:
+                sp_file = list_dir[i].split('.')
+                if sp_file[-1] == 'csv':
+                    csv_files.append(get_path)
+
+        if len(csv_files) == 0:
+            QMessageBox.about(self, 'Ошибка', 'Не найденны csv файлы')
+            self.unlocker()
+        self.my_pool.apply_async(func=read_dir, args=(csv_files,), callback=self.set_data)
+   
+    def set_data(self, solo_data):
+        self.locker()
+        if self.data_array != []:
+            self.data_array.clear()
+        if self.data_array != []:
+            self.login_array.clear()
+        miim, maam = self.change_size()
+        self.UpdateTableHeader(solo_data[0])
+        value = 0
+        value1 = 0
+        step = 100/maam
+        step1 = 100/(len(solo_data)-maam)
+        self.ui.tableWidget.setRowCount(0)
+        for i, row in enumerate(solo_data[1:]):
+            value += step
+            self.callback_obj.progressBarUpdated.emit(value)
+            if miim <= i <= maam:
+                self.callback_obj.tableUpdatedRow.emit(i, miim, row)
+            if i >= maam:
+                value1 += step1
+                self.callback_obj.progressBarUpdated_2.emit(value1)
+        self.callback_obj.progressBarUpdated.emit(0)
+        self.callback_obj.progressBarUpdated_2.emit(0)
+        self.save_array = list.copy(solo_data)
+        self.unlocker()
+        self.chek = True
+    
     def change_size(self):
         miim = 0
         maam = 999
@@ -77,12 +132,6 @@ class Win(QMainWindow):
             else:
                 self.ui.change_sizeLine.setToolTip('Ошибка: введите в виде "int-int"')
         return miim, maam
-        
-    def openButt(self):
-        fileD = QFileDialog()
-        open_file = fileD.getExistingDirectory(self)
-        self.ui.PathFile.setText('')
-        self.ui.PathFile.setText(open_file)
 
     def UpdateTableRow(self, i, miim, row):
         self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
@@ -97,33 +146,6 @@ class Win(QMainWindow):
 
     def UpdateTableHeader(self, row):
         self.ui.tableWidget.setHorizontalHeaderLabels(row)
-
-    def set_data(self, solo_data):
-        self.locker()
-        if self.data_array != []:
-            self.data_array.clear()
-        if self.data_array != []:
-            self.login_array.clear()
-        miim, maam = self.change_size()
-        self.UpdateTableHeader(solo_data[0])
-        value = 0
-        value1 = 0
-        step = 100/maam
-        step1 = 100/(len(solo_data)-maam)
-        self.ui.tableWidget.setRowCount(0)
-        for i, row in enumerate(solo_data[1:]):
-            value += step
-            self.callback_obj.progressBarUpdated.emit(value)
-            if miim <= i <= maam:
-                self.callback_obj.tableUpdatedRow.emit(i, miim, row)
-            if i >= maam:
-                value1 += step1
-                self.callback_obj.progressBarUpdated_2.emit(value1)
-        self.callback_obj.progressBarUpdated.emit(0)
-        self.callback_obj.progressBarUpdated_2.emit(0)
-        self.save_array = list.copy(solo_data)
-        self.unlocker()
-        self.chek = True
 
     def change_cb_index(self):
         id = self.ui.comboBox.currentIndex()
@@ -169,56 +191,47 @@ class Win(QMainWindow):
         else:
             QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл.')
             self.unlocker()
-
         
     def serch_Data(self):
         self.locker()
         if self.login_array != []:
             self.login_array.clear()
         if self.chek:
-            d_t, ok = QInputDialog.getText(self, "Ввод даты и времени", "Введите дату и время для поиска:", QLineEdit.Normal,'YYYY.MM.DD HH:MM:SS')
-            if ok and d_t:
-                if d_t.count('.')==2 and d_t.count(':')==2 and d_t.count(' ')==1:
-                    d_t = d_t.split(' ')
-                    age = d_t[0]
-                    clock = d_t[1]
-                    age = age.split('.')
-                    clock = clock.split(':')
-                    if age.isdigit()==True and clock.isdigit()==True:
-                        unix_time = datetime.datetime(int(age[0]), int(age[1]), int(age[2]), int(clock[0]), int(clock[1]),
-                                                      int(clock[2])).timestamp()
-                        unix_time = int(unix_time)
-                        unix_time += (36000)
-                        unix_time = str(unix_time)
-                        if unix_time in self.data_array:
-                            self.data_array.clear()
-                            self.ui.tableWidget.setRowCount(0)
-                            self.UpdateTableHeader(self.save_array[0])
-                            p = 0
-                            value = 0
-                            for row in self.save_array[1:]:
-                                value += 1
-                                self.callback_obj.progressBarUpdated.emit(value)
-                                if unix_time == row[0]:
-                                    self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
-                                    for j, v in enumerate(row):
-                                        if j == 3:
-                                            self.login_array.append(v)
-                                        it = QTableWidgetItem()
-                                        it.setData(Qt.DisplayRole, v)
-                                        self.ui.tableWidget.setItem(p, j, it)
-                                    p += 1
-                            self.callback_obj.progressBarUpdated.emit(value + 1)
-                            self.callback_obj.progressBarUpdated.emit(0)
-                            self.unlocker()
-                    else:
-                        QMessageBox.about(self, 'Ошибка', 'Неправильный формат данных')
-                        self.unlocker()
-                else:
-                    QMessageBox.about(self, 'Ошибка', 'Неправильный формат данных')
-                    self.unlocker()
+            enter = self.ui.dateTimeEdit.text()
+            enter = enter.split(' ')
+            age = enter[0]
+            clock = enter[1]
+            age = age.split('.')
+            clock = clock.split(':')
+            unix_time = datetime.datetime(int(age[2]), int(age[1]), int(age[0]), int(clock[0]), int(clock[1]),
+                                          int(clock[2])).timestamp()
+            unix_time = int(unix_time)
+            unix_time += (36000)
+            unix_time = str(unix_time)
+            if unix_time in self.data_array:
+                self.data_array.clear()
+                self.ui.tableWidget.setRowCount(0)
+                self.UpdateTableHeader(self.save_array[0])
+                p = 0
+                value = 0
+                for row in self.save_array[1:]:
+                    value += 1
+                    self.callback_obj.progressBarUpdated.emit(value)
+                    if unix_time == row[0]:
+                        self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
+                        for j, v in enumerate(row):
+                            if j == 3:
+                                self.login_array.append(v)
+                            it = QTableWidgetItem()
+                            it.setData(Qt.DisplayRole, v)
+                            self.ui.tableWidget.setItem(p, j, it)
+                        p += 1
+                self.callback_obj.progressBarUpdated.emit(value + 1)
+                self.callback_obj.progressBarUpdated.emit(0)
+                self.unlocker()
+                pass
             else:
-                QMessageBox.about(self, 'Ошибка', 'Введите дату и время')
+                QMessageBox.about(self, 'Ошибка', 'Дата не найдена')
                 self.unlocker()
         else:
             QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл')
@@ -252,29 +265,6 @@ class Win(QMainWindow):
         self.callback_obj.progressBarUpdated.emit(0)
         self.unlocker()
 
-    def analizButt(self):
-        self.locker()
-        path_file = self.ui.PathFile.text()
-        if os.path.exists(path_file) is False:
-            QMessageBox.about(self, 'Ошибка', 'Введите путь')
-            self.ui.PathFile.setText('')
-            self.unlocker()
-            return 2
-        list_dir = os.listdir(path_file)
-        csv_files = []
-        for i in range(len(list_dir)):
-            get_path = os.path.join(path_file, list_dir[i])
-            chek = os.path.isfile(get_path)
-            if chek:
-                sp_file = list_dir[i].split('.')
-                if sp_file[-1] == 'csv':
-                    csv_files.append(get_path)
-
-        if len(csv_files) == 0:
-            QMessageBox.about(self, 'Ошибка', 'Не найденны csv файлы')
-            self.unlocker()
-        self.my_pool.apply_async(func=read_ddir, args=(csv_files,), callback=self.set_data)
-
     def locker(self):
         self.ui.AnalizButt.setDisabled(True)
         self.ui.saveButt.setDisabled(True)
@@ -292,7 +282,7 @@ class Win(QMainWindow):
         self.ui.change_sizeLine.setDisabled(False)
 
 
-def read_ddir(csv_files):
+def read_dir(csv_files):
     files = []
     for i in range(len(csv_files)):
         with open(csv_files[i], 'r') as csv_file:
