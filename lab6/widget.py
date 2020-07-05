@@ -24,6 +24,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(1121, 770)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.scrollArea = QScrollArea(MainWindow)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollArea.setGeometry(QRect(10, 10, 1101, 531))
@@ -31,13 +32,20 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1099, 529))
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.tableWidget = QTableWidget(self.scrollAreaWidgetContents)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setGeometry(QRect(0, 0, 1099, 529))
         self.tableWidget.setAutoFillBackground(True)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.tableWidget.setColumnCount(24) 
+        self.column_label = ['begin', 'end', 'time interval', 'login', 'mac ab', 'ULSK1', 'BRAS ip', 'start count', 'alive count',
+                            'stop count', 'incoming', 'outcoming', 'error_count', 'code 0', 'code 1011', 'code 1100', 'code -3',
+                            'code -52', 'code -42', 'code -21', 'code -40', ' code -44', 'code -46', ' code -38']
+        self.tableWidget.setHorizontalHeaderLabels(self.column_label)
+        
+        
 
         self.PathFile = QLineEdit(self.centralwidget)
         self.PathFile.setGeometry(QRect(200, 10, 831, 31))
@@ -69,10 +77,6 @@ class Ui_MainWindow(object):
         self.AnalizButt = QPushButton(self.centralwidget)
         self.AnalizButt.setGeometry(QRect(20, 570, 301, 28))
         self.AnalizButt.setObjectName("AnalizButt")
-
-        self.change_sizeButt = QPushButton(self.centralwidget)
-        self.change_sizeButt.setObjectName("change_sizeButt")
-        self.change_sizeButt.setGeometry(QRect(20, 650, 301, 28))
         
         self.OpenButt = QPushButton(self.centralwidget)
         self.OpenButt.setGeometry(QRect(400, 710, 615, 40))
@@ -82,6 +86,14 @@ class Ui_MainWindow(object):
         self.change_cbButt.setObjectName("change_cbButt")
         self.change_cbButt.setGeometry(QRect(20, 730, 301, 28))
 
+        self.change_sizeButt = QPushButton(self.centralwidget)
+        self.change_sizeButt.setObjectName(u"change_sizeButt")
+        self.change_sizeButt.setGeometry(QRect(20, 650, 161, 28))
+
+        self.change_sizeLine = QLineEdit(self.centralwidget)
+        self.change_sizeLine.setObjectName("change_sizeLine")
+        self.change_sizeLine.setGeometry(QRect(190, 650, 131, 28))
+
         self.OpenButt.raise_()
         self.AnalizButt.raise_()
         self.change_cbButt.raise_()
@@ -90,6 +102,7 @@ class Ui_MainWindow(object):
         self.tableWidget.raise_()
         self.saveButt.raise_()
         self.comboBox.raise_()
+        self.change_sizeButt.raise_()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -110,7 +123,8 @@ class Ui_MainWindow(object):
         self.saveButt.setText(QCoreApplication.translate("MainWindow", "Сохранить данные", None))
         self.OpenButt.setText(QCoreApplication.translate("MainWindow", "Выбрать папку", None))
         self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить", None))
-        self.change_sizeButt.setText(QCoreApplication.translate("MainWindow", "Изменить размер выборки", None))
         self.AnalizButt.setText(QCoreApplication.translate("MainWindow", "Анализировать", None))
+        self.change_sizeLine.setPlaceholderText(QCoreApplication.translate("MainWindow", "1-1000", None))
+        self.change_sizeButt.setText(QCoreApplication.translate("MainWindow", u"Изменить выборку", None))
     # retranslateUi
 
