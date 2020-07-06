@@ -178,7 +178,6 @@ class Win(QMainWindow):
                                 it.setData(Qt.DisplayRole, v)
                                 self.ui.tableWidget.setItem(p, j, it)
                             p += 1
-                    self.callback_obj.progressBarUpdated.emit(value + 1)
                     self.callback_obj.progressBarUpdated.emit(0)
                     self.unlocker()
                 else:
@@ -225,7 +224,6 @@ class Win(QMainWindow):
                             it.setData(Qt.DisplayRole, v)
                             self.ui.tableWidget.setItem(p, j, it)
                         p += 1
-                self.callback_obj.progressBarUpdated.emit(value + 1)
                 self.callback_obj.progressBarUpdated.emit(0)
                 self.unlocker()
                 pass
