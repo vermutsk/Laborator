@@ -70,20 +70,20 @@ class Win(QMainWindow):
             self.unlocker()
         self.my_pool.apply_async(func=read_dir, args=(csv_files,), callback=self.set_data)
    
-    def set_data(self, solo_data):
+    def set_data(self, full_list):
         self.locker()
         if self.data_array != []:
             self.data_array.clear()
         if self.data_array != []:
             self.login_array.clear()
         miim, maam = self.change_size()
-        self.UpdateTableHeader(solo_data[0])
+        self.UpdateTableHeader(full_list[0])
         value = 0
         value1 = 0
         step = 100/maam
-        step1 = 100/(len(solo_data)-maam)
+        step1 = 100/(len(full_list)-maam)
         self.ui.tableWidget.setRowCount(0)
-        for i, row in enumerate(solo_data[1:]):
+        for i, row in enumerate(full_list[1:]):
             value += step
             self.callback_obj.progressBarUpdated.emit(value)
             if miim <= i <= maam:
@@ -93,7 +93,7 @@ class Win(QMainWindow):
                 self.callback_obj.progressBarUpdated_2.emit(value1)
         self.callback_obj.progressBarUpdated.emit(0)
         self.callback_obj.progressBarUpdated_2.emit(0)
-        self.save_array = list.copy(solo_data)
+        self.save_array = list.copy(full_list)
         self.unlocker()
         self.chek = True
     
@@ -115,7 +115,6 @@ class Win(QMainWindow):
                         if int(maam0) - int(miim0) <= 10000:
                             if int(miim0)>0:
                                 self.ui.change_sizeLine.setToolTip('')
-                                #self.ui.centralwidget.setStyleSheet("change_sizeLine { background-color: white }")
                                 miim = int(miim0)-1
                                 maam = int(maam0)-1
                             elif int(miim0)==0:
@@ -289,11 +288,11 @@ def read_dir(csv_files):
             reader = csv.reader(csv_file)
             data = list(reader)
         files.append(data)
-    solo_data = list.copy(files[0])
+    full_list = list.copy(files[0])
     for i in range(1, len(files)):
         files[i].remove(files[i][0])
         solo_data += files[i]
-    return solo_data
+    return full_list
 
 
 if __name__ == "__main__":
