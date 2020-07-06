@@ -70,20 +70,20 @@ class Win(QMainWindow):
             self.unlocker()
         self.my_pool.apply_async(func=read_dir, args=(csv_files,), callback=self.set_data)
    
-    def set_data(self, full_list):
+    def set_data(self, solo_data):
         self.locker()
         if self.data_array != []:
             self.data_array.clear()
         if self.data_array != []:
             self.login_array.clear()
         miim, maam = self.change_size()
-        self.UpdateTableHeader(full_list[0])
+        self.UpdateTableHeader(solo_data[0])
         value = 0
         value1 = 0
         step = 100/maam
-        step1 = 100/(len(full_list)-maam)
+        step1 = 100/(len(solo_data)-maam)
         self.ui.tableWidget.setRowCount(0)
-        for i, row in enumerate(full_list[1:]):
+        for i, row in enumerate(solo_data[1:]):
             value += step
             self.callback_obj.progressBarUpdated.emit(value)
             if miim <= i <= maam:
@@ -93,7 +93,7 @@ class Win(QMainWindow):
                 self.callback_obj.progressBarUpdated_2.emit(value1)
         self.callback_obj.progressBarUpdated.emit(0)
         self.callback_obj.progressBarUpdated_2.emit(0)
-        self.save_array = list.copy(full_list)
+        self.save_array = list.copy(solo_data)
         self.unlocker()
         self.chek = True
     
@@ -111,8 +111,8 @@ class Win(QMainWindow):
                 miim0 = size[0]
                 maam0 = size[1]
                 try:
-                    if int(miim0)<int(maam0) and int(miim0)>=0 and int(maam0)<11000:
-                        if int(maam0) - int(miim0) <= 10000:
+                    if int(miim0)<int(maam0) and int(miim0)>=0:
+                        if int(maam0) - int(miim0) <= 10000 or int(maam0)<11000:
                             if int(miim0)>0:
                                 self.ui.change_sizeLine.setToolTip('')
                                 miim = int(miim0)-1
@@ -123,13 +123,16 @@ class Win(QMainWindow):
                                 maam = int(maam0)
                         else:
                             self.ui.change_sizeLine.setToolTip('Ошибка: слишком большой интервал')
-                            self.setStyleSheet("change_sizeLine { background-color: red }")
+                            QMessageBox.about(self, 'Ошибка', 'Cлишком большой интервал')
                     else:
                         self.ui.change_sizeLine.setToolTip('Ошибка: min > max')
+                        QMessageBox.about(self, 'Ошибка', 'min > max')
                 except Exception:
-                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения')   
+                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения')
+                    QMessageBox.about(self, 'Ошибка', 'Введите численные значения')   
             else:
                 self.ui.change_sizeLine.setToolTip('Ошибка: введите в виде "int-int"')
+                QMessageBox.about(self, 'Ошибка', 'Введите в виде "int-int"')
         return miim, maam
 
     def UpdateTableRow(self, i, miim, row):
@@ -166,8 +169,10 @@ class Win(QMainWindow):
                     self.UpdateTableHeader(self.save_array[0])
                     p = 0
                     value = 0
+                    max = len(self.save_array)-1
+                    step = 100/max
                     for row in self.save_array[1:]:
-                        value += 1
+                        value += step
                         self.callback_obj.progressBarUpdated.emit(value)
                         if login in row:
                             self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
@@ -204,7 +209,6 @@ class Win(QMainWindow):
             unix_time = datetime.datetime(int(age[2]), int(age[1]), int(age[0]), int(clock[0]), int(clock[1]),
                                           int(clock[2])).timestamp()
             unix_time = int(unix_time)
-            unix_time += (36000)
             unix_time = str(unix_time)
             if unix_time in self.data_array:
                 self.data_array.clear()
@@ -212,10 +216,12 @@ class Win(QMainWindow):
                 self.UpdateTableHeader(self.save_array[0])
                 p = 0
                 value = 0
+                max = len(self.save_array)-1
+                step = 100/max
                 for row in self.save_array[1:]:
-                    value += 1
+                    value += step
                     self.callback_obj.progressBarUpdated.emit(value)
-                    if unix_time == row[0]:
+                    if row[0] <= unix_time <= row[1]:
                         self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
                         for j, v in enumerate(row):
                             if j == 3:
@@ -286,11 +292,11 @@ def read_dir(csv_files):
             reader = csv.reader(csv_file)
             data = list(reader)
         files.append(data)
-    full_list = list.copy(files[0])
+    solo_data = list.copy(files[0])
     for i in range(1, len(files)):
         files[i].remove(files[i][0])
         solo_data += files[i]
-    return full_list
+    return solo_data
 
 
 if __name__ == "__main__":
