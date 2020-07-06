@@ -49,16 +49,16 @@ class Win(QMainWindow):
 
     def analizButt(self):
         self.locker()
-        path_file = self.ui.PathFile.text()
-        if os.path.exists(path_file) is False:
+        way_file = self.ui.PathFile.text()
+        if os.path.exists(way_file) is False:
             QMessageBox.about(self, 'Ошибка', 'Введите путь')
             self.ui.PathFile.setText('')
             self.unlocker()
             return 2
-        list_dir = os.listdir(path_file)
+        list_dir = os.listdir(way_file)
         csv_files = []
         for i in range(len(list_dir)):
-            get_path = os.path.join(path_file, list_dir[i])
+            get_path = os.path.join(way_file, list_dir[i])
             chek = os.path.isfile(get_path)
             if chek:
                 sp_file = list_dir[i].split('.')
@@ -77,11 +77,11 @@ class Win(QMainWindow):
         if self.data_array != []:
             self.login_array.clear()
         miim, maam = self.change_size()
-        self.UpdateTableHeader(solo_data[0])
         value = 0
         value1 = 0
         step = 100/maam
-        step1 = 100/(len(solo_data)-maam)
+        if len(solo_data) >= maam:  
+            step1 = 100/(len(solo_data)-maam)
         self.ui.tableWidget.setRowCount(0)
         for i, row in enumerate(solo_data[1:]):
             value += step
@@ -165,11 +165,9 @@ class Win(QMainWindow):
             if ok and login:
                 if login in self.login_array:
                     self.login_array.clear()
-                    self.ui.tableWidget.setRowCount(0)
-                    self.UpdateTableHeader(self.save_array[0])
                     p = 0
                     value = 0
-                    max = len(self.save_array)-1
+                    max = len(self.save_array[1:])
                     step = 100/max
                     for row in self.save_array[1:]:
                         value += step
@@ -216,7 +214,7 @@ class Win(QMainWindow):
                 self.UpdateTableHeader(self.save_array[0])
                 p = 0
                 value = 0
-                max = len(self.save_array)-1
+                max = len(self.save_array[1:])
                 step = 100/max
                 for row in self.save_array[1:]:
                     value += step
@@ -254,12 +252,13 @@ class Win(QMainWindow):
             self.unlocker()
             return 1
         value = 0
+        step = 100/rowCount
         with open(d[0], 'w', newline='') as file_csv:
             writher = csv.writer(file_csv)
             writher.writerow(header)
             for i in range(rowCount):
                 save = []
-                value += 1
+                value += step
                 self.callback_obj.progressBarUpdated.emit(value)
                 for j in range(columCount):
                     p = self.ui.tableWidget.item(i, j).text()
