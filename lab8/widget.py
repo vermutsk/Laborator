@@ -40,10 +40,8 @@ class Ui_MainWindow(object):
         self.tableWidget.setGeometry(QRect(0, 0, 1099, 529))
         self.tableWidget.setAutoFillBackground(True)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
-        self.tableWidget.setColumnCount(24) 
-        self.column_label = ['begin', 'end', 'time interval', 'login', 'mac ab', 'ULSK1', 'BRAS ip', 'start count', 'alive count',
-                            'stop count', 'incoming', 'outcoming', 'error_count', 'code 0', 'code 1011', 'code 1100', 'code -3',
-                            'code -52', 'code -42', 'code -21', 'code -40', ' code -44', 'code -46', ' code -38']
+        self.tableWidget.setColumnCount(7) 
+        self.column_label = ['№', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
         self.tableWidget.setHorizontalHeaderLabels(self.column_label)
         
         self.PathFile = QLineEdit(self.centralwidget)
@@ -64,16 +62,16 @@ class Ui_MainWindow(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
+        self.comboBox.addItem("")
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.setGeometry(QRect(20, 690, 161, 28))
+        self.comboBox.setGeometry(QRect(20, 690, 321, 28))
         self.comboBox.setEditable(False)
         self.comboBox.setDuplicatesEnabled(False)
 
-        self.dateTimeEdit = QDateTimeEdit(MainWindow)
-        self.dateTimeEdit.setObjectName("dateTimeEdit")
-        self.dateTimeEdit.setGeometry(QRect(190, 690, 151, 28))
-        self.dateTimeEdit.setCurrentSection(QDateTimeEdit.DaySection)
-        
+        self.comboBox_2 = QComboBox(self.centralwidget)
+        self.comboBox_2.setGeometry(QRect(20, 650, 321, 28))
+        self.comboBox_2.setObjectName("comboBox2")
+        self.comboBox_2.addItem("")
 
         self.saveButt = QPushButton(self.centralwidget)
         self.saveButt.setGeometry(QRect(20, 610, 321, 28))
@@ -91,14 +89,6 @@ class Ui_MainWindow(object):
         self.change_cbButt.setObjectName("change_cbButt")
         self.change_cbButt.setGeometry(QRect(20, 730, 321, 28))
 
-        self.change_sizeButt = QPushButton(self.centralwidget)
-        self.change_sizeButt.setObjectName(u"change_sizeButt")
-        self.change_sizeButt.setGeometry(QRect(20, 650, 161, 28))
-
-        self.change_sizeLine = QLineEdit(self.centralwidget)
-        self.change_sizeLine.setObjectName("change_sizeLine")
-        self.change_sizeLine.setGeometry(QRect(190, 650, 151, 28))
-
         self.OpenButt.raise_()
         self.AnalizButt.raise_()
         self.change_cbButt.raise_()
@@ -107,8 +97,7 @@ class Ui_MainWindow(object):
         self.tableWidget.raise_()
         self.saveButt.raise_()
         self.comboBox.raise_()
-        self.dateTimeEdit.raise_()
-        self.change_sizeButt.raise_()
+        self.comboBox_2.raise_()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -121,17 +110,16 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.tableWidget.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)
-        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", "Парамметры выборки", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", "Выборка по логину", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", "Выборка по дате", None))
+        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", "Поиск по ...", None))
+        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", "Поиск по никнейму", None))
+        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", "Поиск по номеру телефона", None))
+        self.comboBox.setItemText(3, QCoreApplication.translate("MainWindow", "Поиск по фамилии", None))
         self.comboBox.setCurrentText(QCoreApplication.translate("MainWindow", "\u041f\u043e\u043b\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a", None))
         self.comboBox.setPlaceholderText("")
-        self.dateTimeEdit.setDisplayFormat(QCoreApplication.translate("MainWindow", "dd.MM.yyyy H:mm:ss"))
         self.saveButt.setText(QCoreApplication.translate("MainWindow", "Сохранить данные", None))
         self.OpenButt.setText(QCoreApplication.translate("MainWindow", "Выбрать папку", None))
         self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить парамметры", None))
         self.AnalizButt.setText(QCoreApplication.translate("MainWindow", "Анализировать", None))
-        self.change_sizeLine.setPlaceholderText(QCoreApplication.translate("MainWindow", "1-1000", None))
-        self.change_sizeButt.setText(QCoreApplication.translate("MainWindow", u"Изменить выборку", None))
+        self.comboBox_2.setItemText(0, QCoreApplication.translate("MainWindow", "1 - 100", None))
     # retranslateUi
 
