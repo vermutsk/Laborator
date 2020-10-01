@@ -16,9 +16,15 @@ from PySide2.QtWidgets import (QScrollArea, QWidget, QTableView, QPushButton,
 
 client = MongoClient("localhost", 27017) 
 db = client['NEW_DB']
-new_collection = db['new']
+test = 0
+new_collection = db[f'{test}']
 new_collection.drop()
-new_collection = db['new']
+#coll = db.collection_names()
+#coll.reverse()
+#if len(coll) != 0:
+#    test = coll[0]
+#    test = int(test)
+new_collection = db[f'{test}']
 lenght = new_collection.find().count()
 
 
@@ -53,12 +59,13 @@ class Win(QMainWindow):
         self.ui.AnalizButt.setDisabled(True)
         self.ui.saveButt.setDisabled(True)
         self.ui.change_cbButt.setDisabled(True)
-
+        self.ui.DeleteButt.setDisabled(True)
 
     def unlocker(self):
         self.ui.AnalizButt.setDisabled(False)
         self.ui.saveButt.setDisabled(False)
         self.ui.change_cbButt.setDisabled(False)
+        self.ui.DeleteButt.setDisabled(False)
 
     #Delete
     def delete_data(self):
@@ -126,7 +133,6 @@ class Win(QMainWindow):
                     data.reverse()
                     data.append(f'{number + 1}')
                     data.append(f'{pers_id + 1}')
-                    #переделать и добавить персональный id
                     data.reverse()
                     header= ['pers_id','number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
                     for i in range(8): 
@@ -234,6 +240,7 @@ class Win(QMainWindow):
                 elif id == 3:
                     one_doc = self.serch('fname', value)
                 if len(one_doc) != 0:
+                    self.ui.tableWidget.setRowCount(0)
                     row_count = len(one_doc)
                     value = 0
                     if type(one_doc[0]) == list:
@@ -247,7 +254,6 @@ class Win(QMainWindow):
                         value += 1
                         self.callback_obj.progressBarUpdated.emit(value)
                         self.callback_obj.tableUpdatedRow.emit(0, 0, solo_data)
-                    #выводит лишние сто......................................................
                     self.callback_obj.progressBarUpdated.emit(value + 1)
                     self.callback_obj.progressBarUpdated.emit(0)
                     
