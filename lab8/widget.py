@@ -74,23 +74,33 @@ class Ui_MainWindow(object):
         self.comboBox_2.addItem("")
 
         self.saveButt = QPushButton(self.centralwidget)
-        self.saveButt.setGeometry(QRect(20, 610, 321, 28))
+        self.saveButt.setGeometry(QRect(20, 610, 155, 28))
         self.saveButt.setObjectName("saveButt")
 
         self.AnalizButt = QPushButton(self.centralwidget)
         self.AnalizButt.setGeometry(QRect(20, 570, 321, 28))
         self.AnalizButt.setObjectName("AnalizButt")
-        
-        self.OpenButt = QPushButton(self.centralwidget)
-        self.OpenButt.setGeometry(QRect(400, 710, 615, 40))
-        self.OpenButt.setObjectName("OpenButt")
 
+        self.DeleteButt = QPushButton(self.centralwidget)
+        self.DeleteButt.setGeometry(QRect(170, 610, 170, 28))
+        self.DeleteButt.setObjectName("UpdateButt")
+
+        self.OpenBox = QComboBox(MainWindow)
+        self.OpenBox.addItem("")
+        self.OpenBox.addItem("")
+        self.OpenBox.addItem("")
+        self.OpenBox.setObjectName("OpenBox")
+        self.OpenBox.setGeometry(QRect(400, 710, 160, 40))
+        self.OpenBox.setEditable(False)
+        self.OpenBox.setDuplicatesEnabled(False)
+    
         self.change_cbButt = QPushButton(self.centralwidget)
         self.change_cbButt.setObjectName("change_cbButt")
         self.change_cbButt.setGeometry(QRect(20, 730, 321, 28))
 
-        self.OpenButt.raise_()
+        self.OpenBox.raise_()
         self.AnalizButt.raise_()
+        self.DeleteButt.raise_()
         self.change_cbButt.raise_()
         self.progressBar.raise_()
         self.PathFile.raise_()
@@ -117,8 +127,11 @@ class Ui_MainWindow(object):
         self.comboBox.setCurrentText(QCoreApplication.translate("MainWindow", "\u041f\u043e\u043b\u043d\u044b\u0439 \u0441\u043f\u0438\u0441\u043e\u043a", None))
         self.comboBox.setPlaceholderText("")
         self.saveButt.setText(QCoreApplication.translate("MainWindow", "Сохранить данные", None))
-        self.OpenButt.setText(QCoreApplication.translate("MainWindow", "Выбрать папку", None))
+        self.OpenBox.setItemText(0, QCoreApplication.translate("MainWindow", "Выбрать данные", None))
+        self.OpenBox.setItemText(1, QCoreApplication.translate("MainWindow", "Выбрать папку", None))
+        self.OpenBox.setItemText(2, QCoreApplication.translate("MainWindow", "Ввести данные", None))
         self.change_cbButt.setText(QCoreApplication.translate("MainWindow", "Изменить парамметры", None))
+        self.DeleteButt.setText(QCoreApplication.translate("MainWindow", "Удалить данные", None))
         self.AnalizButt.setText(QCoreApplication.translate("MainWindow", "Анализировать", None))
         self.comboBox_2.setItemText(0, QCoreApplication.translate("MainWindow", "1 - 100", None))
     # retranslateUi
