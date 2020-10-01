@@ -5,6 +5,7 @@ import datetime
 import multiprocessing as mp
 from pymongo import MongoClient
 from widget import Ui_MainWindow
+from loading import Ui_Dialog
 from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject, Signal,
     QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
@@ -82,7 +83,6 @@ class Win(QMainWindow):
             row2 = {header[i] : data[i]}
             row1.update(row2)
         res.append(row1)
-        print(res)
         new_collection.delete_one(row1)
 
     #Update
@@ -141,7 +141,6 @@ class Win(QMainWindow):
                         row.update(row1)
                     res.append(row)
                     new_collection.insert_many(res)
-                    print(res)
                     if number + 1 <= 100:
                         data.pop(0)
                         self.callback_obj.tableUpdatedRow.emit(pers_id, 0, data)
@@ -151,9 +150,7 @@ class Win(QMainWindow):
                 else:
                     QMessageBox.about(self, 'Ошибка', 'Неверный формат данных')
                     self.unlocker()
-                print(data)
                 lenght = new_collection.find().count()
-                print(lenght)
             else:
                 QMessageBox.about(self, 'Ошибка', 'Введите данные.')
                 self.unlocker()
@@ -166,7 +163,6 @@ class Win(QMainWindow):
             it = QTableWidgetItem()
             it.setData(Qt.DisplayRole, v)
             self.ui.tableWidget.setItem((i - miim), j, it)
-            print(i-miim, j)
 
     def UpdateTableHeader(self, row):
         self.ui.tableWidget.setHorizontalHeaderLabels(row)
@@ -207,12 +203,10 @@ class Win(QMainWindow):
             value += 1
             self.callback_obj.progressBarUpdated.emit(value)
             self.callback_obj.tableUpdatedRow.emit(i, miim, solo_data)
-        print(i, miim, maam)
         self.callback_obj.progressBarUpdated.emit(value + 1)
         self.callback_obj.progressBarUpdated.emit(0)
 
     def serch(self, param, value):
-        print('я пытался')
         js = new_collection.find({param : value}, { '_id' : 0, 'pers_id' : 0})
         many_doc = []
         one_doc = []
@@ -232,9 +226,7 @@ class Win(QMainWindow):
             value, ok = QInputDialog.getText(self, "Ввод параметра", "Введите параметр для поиска:", QLineEdit.Normal,'')
             if ok and value:
                 if id ==1:
-                    print(value)
                     one_doc = self.serch('nik', value)
-                    print(one_doc)
                 elif id == 2:
                     one_doc = self.serch('phone', value)
                 elif id == 3:
@@ -311,7 +303,6 @@ class Win(QMainWindow):
                 one_doc.pop(0) 
                 pers_id = one_doc[0]
                 number = one_doc[1]
-        print(pers_id, number)
         return int(pers_id), int(number)
 
 
@@ -334,7 +325,6 @@ def read_dir(csv_files, pers_id):
                     row2 = {}
                     row2 = {header[i] : each[i]}
                     row.update(row2)
-                print(each)
                 res.append(row)
             new_collection.insert_many(res)
     lenght = new_collection.find().count()
