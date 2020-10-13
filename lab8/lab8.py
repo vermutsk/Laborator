@@ -3,21 +3,99 @@ import sys
 import csv
 import datetime
 import multiprocessing as mp
+from pymongo import MongoClient
 from widget import Ui_MainWindow
 from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject, Signal,
-    QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)
+    QObject, QPoint, QRect, QSize, QTime, QUrl, Qt, QThread)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
     QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter,
     QPixmap, QRadialGradient)
 from PySide2.QtWidgets import (QScrollArea, QWidget, QTableView, QPushButton,
     QProgressBar, QComboBox, QApplication, QMainWindow, QAbstractItemView, 
-    QMessageBox, QTableWidgetItem, QFileDialog, QInputDialog, QLineEdit)
+    QMessageBox, QTableWidgetItem, QFileDialog, QInputDialog, QLineEdit, QProgressDialog)
+
+client = MongoClient("localhost", 27017) 
+db = client['NEW_DB']
+test = 0
+new_collection = db[f'{test}']
+new_collection.drop()
+#coll = db.collection_names()
+#coll.reverse()
+#if len(coll) != 0:
+#    test = coll[0]
+#    test = int(test)
+new_collection = db[f'{test}']
+
 
 class SyncObj(QObject):
     progressBarUpdated = Signal(int)
-    progressBarUpdated_2 = Signal(int)
     tableUpdatedRow = Signal((int, int, list))
     tableUpdatedHeader = Signal(int)
+
+class Worker(QObject):
+    loaded = Signal(int, str)
+    finished = Signal()
+
+    def __init__(self, csv_files, b):
+        super().__init__()
+        self._files = csv_files
+        self._size = b
+
+    def run(self):
+        self._stop = False
+        step = 0
+        for i in range(len(self._files)):   
+            with open(self._files[i], 'r') as csv_file:
+                size0 = 0
+                for k in range(100):
+                    line = csv_file.readline()
+                    size0 += sys.getsizeof(line)
+                lenght = size0 / 100
+                lenght = self._size / lenght
+                lenght = int(lenght)
+                self.showProgress('Загрузка файлов', lenght, self.stop)
+                self.loaded.connect(self.updateProgress) 
+            with open(self._files[i], 'r') as csv_file:
+                reader = csv.reader(csv_file, delimiter = '|')
+                header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+                for each in reader:
+                    if self._stop:
+                        break
+                    res = []
+                    row = {}
+                    trash = each.count('')
+                    for i in range(trash):
+                        each.remove('')
+                    for i in range(7):
+                        row2 = {}
+                        row2 = {header[i] : each[i]}
+                        row.update(row2)
+                    res.append(row)
+                    new_collection.insert_many(res)
+                    self.loaded.emit(step, f'{lenght} документов')
+                    if step < lenght-1:
+                        step += 1
+                step += 1
+                self.loaded.emit(step, f'{lenght} документов')
+        self.finished.emit()
+
+    def updateProgress(self, count, file):
+        if not self.progress.wasCanceled():
+            self.progress.setLabelText('Ожидается примерно %s' % os.path.basename(file))
+            self.progress.setValue(count)
+
+    def showProgress(self, text, length, handler):
+        self.progress = QProgressDialog(text, "Отмена", 0, length)
+        self.progress.setWindowModality(Qt.WindowModal)
+        self.progress.canceled.connect(
+            handler, type=Qt.DirectConnection)
+        self.progress.forceShow()
+
+    def stop(self):
+        lenght = new_collection.find().count()
+        w.set_data(lenght)
+        self._stop = True
+
 
 class Win(QMainWindow):
     def __init__(self, parent=None):
@@ -25,29 +103,173 @@ class Win(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.chek = False
-        self.login_array = []
-        self.data_array = []
+        self.ui.comboBox_2.currentIndexChanged.connect(self.change_size_butt)
         self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.PathFile.setReadOnly(True)
-        self.ui.OpenButt.clicked.connect(self.openButt)
+        self.ui.OpenBox.currentIndexChanged.connect(self.openButt)
         self.ui.AnalizButt.clicked.connect(self.analizButt)
-        self.ui.change_cbButt.clicked.connect(self.change_cb_index)
-        self.ui.change_sizeButt.clicked.connect(self.change_size)
+        self.ui.change_cbButt.clicked.connect(self.search_with_param)
         self.ui.saveButt.clicked.connect(self.save_Data)
+        self.ui.DeleteButt.clicked.connect(self.delete_data)
+        self.ui.UpdateButt.clicked.connect(self.update_data)
         self.my_pool = mp.Pool(1)
         self.callback_obj = SyncObj()
         self.callback_obj.progressBarUpdated.connect(self.ui.progressBar.setValue)
-        self.callback_obj.progressBarUpdated_2.connect(self.ui.progressBar_2.setValue)
         self.callback_obj.tableUpdatedRow.connect(self.UpdateTableRow)
         self.callback_obj.tableUpdatedHeader.connect(self.UpdateTableHeader)
+        self.setStyleSheet('QMainWindow { background-color: rgba(15, 19, 20, 0.82); color: white;} '
+                            'QTableWidget {background-color: rgba(15, 19, 20, 0.82); color: white; '
+                            'border: 2px solid rgba(11, 33, 38, 0.96);  gridline-color: rgba(16, 74, 29, 0.96);'
+                            'selection-background-color: rgba(13, 99, 5, 0.96); } '
+                            'QPushButton { background-color: rgba(16, 74, 29, 0.96); color: white; }'
+                            'QProgressBar:chunk {background-color: rgba(34, 242, 15, 0.96); }'
+                            'QProgressBar { text-align: center; border: 2px solid rgba(11, 33, 38, 0.96); border-radius: 5px;'
+                            'background-color: rgba(27, 51, 25, 0.96); color: white; }'
+                            'QComboBox {background-color: rgba(16, 74, 29, 0.96); color: white; }')
 
+    def locker(self):
+        self.ui.AnalizButt.setDisabled(True)
+        self.ui.saveButt.setDisabled(True)
+        self.ui.change_cbButt.setDisabled(True)
+        self.ui.DeleteButt.setDisabled(True)
+        self.ui.UpdateButt.setDisabled(True)
+        self.ui.OpenBox.setDisabled(True)
+
+    def unlocker(self):
+        self.ui.AnalizButt.setDisabled(False)
+        self.ui.saveButt.setDisabled(False)
+        self.ui.change_cbButt.setDisabled(False)
+        self.ui.DeleteButt.setDisabled(False)
+        self.ui.UpdateButt.setDisabled(False)
+        self.ui.OpenBox.setDisabled(False)
+
+    #Delete
+    def delete_data(self):
+        if self.chek:
+            row = self.ui.tableWidget.currentRow()
+            data = []
+            res = []
+            row1 = {}
+            for i in range(7):
+                item = self.ui.tableWidget.item(row, i).text()
+                data.append(item)
+            header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+            for i in range(7):
+                row2 = {}
+                row2 = {header[i] : data[i]}
+                row1.update(row2)
+            res.append(row1)
+            new_collection.delete_one(row1)
+            QMessageBox.about(self, 'Успешно', 'Для просмотра изменений обновите выборку') 
+        else:
+            QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл.')
+        
+
+    #Update
+    def update_data(self):
+        if self.chek:
+            row = self.ui.tableWidget.currentRow()
+            column = self.ui.tableWidget.currentColumn()
+            value, ok = QInputDialog.getText(self, "Ввод нового значения", "Введите новое значение", QLineEdit.Normal,'')
+            if value and ok:
+                data = []
+                row1 = {}
+                for i in range(7):
+                    item = self.ui.tableWidget.item(row, i).text()
+                    data.append(item)
+                header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+                for i in range(7):
+                    row2 = {}
+                    row2 = {header[i] : data[i]}
+                    row1.update(row2) 
+                new_collection.update_one(row1, {"$set":{f'{header[column]}': f'{value}'}})
+                QMessageBox.about(self, 'Успешно!', 'Для просмотра изменений обновите выборку')     
+            else:
+                QMessageBox.about(self, 'Ошибка', 'Введите данные.')
+        else:
+            QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл.')
+
+    #Save
+    def save_Data(self):
+        self.locker()
+        header = ['№', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+        rowCount = self.ui.tableWidget.rowCount()
+        columCount = 7
+        d = QFileDialog.getSaveFileName(self, "Сохранение", "/analized_table",
+                                                "Файл Microsoft Excel (*.csv)")
+        if d[0] == '':
+            QMessageBox.about(self, 'Ошибка', 'Вы отменили сохранение')
+            self.unlocker()
+            return 1
+        value = 0
+        step = 100/rowCount
+        with open(d[0], 'w', newline='') as file_csv:
+            writher = csv.writer(file_csv, delimiter = '|')
+            writher.writerow(header)
+            for i in range(rowCount):
+                save = []
+                value += step
+                self.callback_obj.progressBarUpdated.emit(value)
+                for j in range(columCount):
+                    p = self.ui.tableWidget.item(i, j).text()
+                    save.append(p)
+                writher.writerow(save)
+        self.callback_obj.progressBarUpdated.emit(0)
+        self.unlocker()
+
+    #Open
     def openButt(self):
-        fileD = QFileDialog()
-        open_file = fileD.getExistingDirectory(self)
-        self.ui.PathFile.setText('')
-        self.ui.PathFile.setText(open_file)
+        id = self.ui.OpenBox.currentIndex()
+        if id == 1:
+            fileD = QFileDialog()
+            open_file = fileD.getExistingDirectory(self)
+            self.ui.PathFile.setText('')
+            self.ui.PathFile.setText(open_file)
+        elif id ==2:
+            str0, ok = QInputDialog.getText(self, "Ввод параметра", "Введите данные в виде: name|fname|phone|uid|nik|wo", QLineEdit.Normal,'')
+            if str0 and ok:
+                data = str0.split('|')
+                if len(data) == 6:
+                    res = []
+                    row = {}
+                    number = self.check_last_doc()
+                    data.reverse()
+                    data.append(f'{number + 1}')
+                    data.reverse()
+                    header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+                    for i in range(7): 
+                        row1 = {}
+                        row1 = {header[i] : data[i]}
+                        row.update(row1)
+                    res.append(row)
+                    new_collection.insert_many(res)
+                    if number + 1 <= 100:
+                        data.pop(0)
+                        self.callback_obj.tableUpdatedRow.emit(number, 0, data)
+                    else:
+                        pass
+                    self.chek = True
+                else:
+                    QMessageBox.about(self, 'Ошибка', 'Неверный формат данных')
+                    self.unlocker()
+            else:
+                QMessageBox.about(self, 'Ошибка', 'Введите данные.')
+                self.unlocker()
+
+
+    #Загрузка в таблицу + сортировка
+    def UpdateTableRow(self, i, miim, row):
+        self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
+        for j, v in enumerate(row):
+            it = QTableWidgetItem()
+            it.setData(Qt.DisplayRole, v)
+            self.ui.tableWidget.setItem((i - miim), j, it)
+
+    def UpdateTableHeader(self, row):
+        self.ui.tableWidget.setHorizontalHeaderLabels(row)
 
     def analizButt(self):
+        self.locker()
         self.locker()
         way_file = self.ui.PathFile.text()
         if os.path.exists(way_file) is False:
@@ -62,240 +284,132 @@ class Win(QMainWindow):
             chek = os.path.isfile(get_path)
             if chek:
                 sp_file = list_dir[i].split('.')
-                if sp_file[-1] == 'csv':
+                if sp_file[-1] == 'txt':
                     csv_files.append(get_path)
 
         if len(csv_files) == 0:
-            QMessageBox.about(self, 'Ошибка', 'Не найденны csv файлы')
+            QMessageBox.about(self, 'Ошибка', 'Не найденны txt файлы')
             self.unlocker()
-        self.my_pool.apply_async(func=read_dir, args=(csv_files,), callback=self.set_data)
-   
-    def set_data(self, solo_data):
-        self.locker()
-        if self.data_array != []:
-            self.data_array.clear()
-        if self.data_array != []:
-            self.login_array.clear()
-        miim, maam = self.change_size()
-        value = 0
-        value1 = 0
-        step = 100/maam
-        if len(solo_data) >= maam:  
-            step1 = 100/(len(solo_data)-maam)
+        b = os.path.getsize(get_path)
+        self.worker = Worker(csv_files, b)
+        self.worker.run()
+
+    def import_data(self, miim, maam):
+        step = 0
+        head = self.serch('number','№')
+        self.UpdateTableHeader(head)
         self.ui.tableWidget.setRowCount(0)
-        for i, row in enumerate(solo_data[1:]):
-            value += step
-            self.callback_obj.progressBarUpdated.emit(value)
-            if miim <= i <= maam:
-                self.callback_obj.tableUpdatedRow.emit(i, miim, row)
-            if i >= maam:
-                value1 += step1
-                self.callback_obj.progressBarUpdated_2.emit(value1)
+        lim = maam - miim
+        data = new_collection.find({}, { '_id' : 0}).skip(miim).limit(lim+1)
+        i = miim
+        for doc in data:
+            one_doc = []
+            for value in doc.values():
+                one_doc.append(value)
+            step += 1
+            self.callback_obj.progressBarUpdated.emit(step)
+            self.callback_obj.tableUpdatedRow.emit(i, miim, one_doc)
+            i +=1
+        self.callback_obj.progressBarUpdated.emit(step + 1)
         self.callback_obj.progressBarUpdated.emit(0)
-        self.callback_obj.progressBarUpdated_2.emit(0)
-        self.save_array = list.copy(solo_data)
-        self.unlocker()
-        self.hek = True
-    
-    def change_size(self):
-        miim = 0
-        maam = 999
+
+    def serch(self, param, value):
+        js = new_collection.find({param : value}, { '_id' : 0})
+        many_doc = []
+        one_doc = []
+        for doc in js:
+            one_doc = []
+            for value in doc.values():
+                one_doc.append(value)
+            many_doc.append(one_doc)
+        if len(many_doc) > 1:
+            return many_doc
+        else:
+            return one_doc
+
+    def search_with_param(self):
         if self.chek:
-            size = self.ui.change_sizeLine.text()
-            if size == '':
-                miim = 0
-                maam = 999
-                self.ui.change_sizeLine.setToolTip('')
-            elif len(size)>2 and size.find('-') != -1 and size.count('-')==1:
-                size = size.split('-')
-                miim0 = size[0]
-                maam0 = size[1]
-                try:
-                    if int(miim0)<int(maam0) and int(miim0)>=0:
-                        if int(maam0) - int(miim0) <= 10000 or int(maam0)<11000:
-                            if int(miim0)>0:
-                                self.ui.change_sizeLine.setToolTip('')
-                                miim = int(miim0)-1
-                                maam = int(maam0)-1
-                            elif int(miim0)==0:
-                                self.ui.change_sizeLine.setToolTip('')
-                                miim = int(miim0)
-                                maam = int(maam0)
-                        else:
-                            self.ui.change_sizeLine.setToolTip('Ошибка: слишком большой интервал')
-                            QMessageBox.about(self, 'Ошибка', 'Cлишком большой интервал')
-                    else:
-                        self.ui.change_sizeLine.setToolTip('Ошибка: min > max')
-                        QMessageBox.about(self, 'Ошибка', 'min > max')
-                except Exception:
-                    self.ui.change_sizeLine.setToolTip('Ошибка: введите численные значения')
-                    QMessageBox.about(self, 'Ошибка', 'Введите численные значения')   
-            else:
-                self.ui.change_sizeLine.setToolTip('Ошибка: введите в виде "int-int"')
-                QMessageBox.about(self, 'Ошибка', 'Введите в виде "int-int"')
-        return miim, maam
-
-    def UpdateTableRow(self, i, miim, row):
-        self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
-        for j, v in enumerate(row):
-            if j == 0:
-                self.data_array.append(v)
-            elif j == 3:
-                self.login_array.append(v)
-            it = QTableWidgetItem()
-            it.setData(Qt.DisplayRole, v)
-            self.ui.tableWidget.setItem((i - miim), j, it)
-
-    def UpdateTableHeader(self, row):
-        self.ui.tableWidget.setHorizontalHeaderLabels(row)
-
-    def change_cb_index(self):
-        id = self.ui.comboBox.currentIndex()
-        if id ==1:
-            self.serch_Login()
-        elif id == 2:
-            self.serch_Data()
-
-    def serch_Login(self):
-        self.locker()
-        if self.data_array != []:
-            self.data_array.clear()
-        if self.chek:
-            login, ok = QInputDialog.getText(self, "Ввод логина", "Введите логин для поиска:", QLineEdit.Normal,'')
-            if ok and login:
-                if login in self.login_array:
-                    self.login_array.clear()
-                    p = 0
+            id = self.ui.comboBox.currentIndex()
+            value, ok = QInputDialog.getText(self, "Ввод параметра", "Введите параметр для поиска:", QLineEdit.Normal,'')
+            if ok and value:
+                if id ==1:
+                    one_doc = self.serch('nik', value)
+                elif id == 2:
+                    one_doc = self.serch('phone', value)
+                elif id == 3:
+                    one_doc = self.serch('fname', value)
+                if len(one_doc) != 0:
+                    self.ui.tableWidget.setRowCount(0)
+                    row_count = len(one_doc)
                     value = 0
-                    max = len(self.save_array[1:])
-                    step = 100/max
-                    for row in self.save_array[1:]:
-                        value += step
+                    if type(one_doc[0]) == list:
+                        for i in range(row_count):
+                            solo_data = one_doc[i]
+                            value += 1
+                            self.callback_obj.progressBarUpdated.emit(value)
+                            self.callback_obj.tableUpdatedRow.emit(i, 0, solo_data)
+                    else:
+                        solo_data = one_doc
+                        value += 1
                         self.callback_obj.progressBarUpdated.emit(value)
-                        if login in row:
-                            self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
-                            for j, v in enumerate(row):
-                                if j == 0:
-                                    self.data_array.append(v)
-                                it = QTableWidgetItem()
-                                it.setData(Qt.DisplayRole, v)
-                                self.ui.tableWidget.setItem(p, j, it)
-                            p += 1
+                        self.callback_obj.tableUpdatedRow.emit(0, 0, solo_data)
+                    self.callback_obj.progressBarUpdated.emit(value + 1)
                     self.callback_obj.progressBarUpdated.emit(0)
-                    self.unlocker()
+                    
                 else:
-                    QMessageBox.about(self, 'Ошибка', 'Логина не найдено.')
+                    QMessageBox.about(self, 'Ошибка', 'Параметр не найден')
                     self.unlocker()
             else:
-                QMessageBox.about(self, 'Ошибка', 'Введите логин.')
+                QMessageBox.about(self, 'Ошибка', 'Введите параметр.')
                 self.unlocker()
         else:
             QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл.')
             self.unlocker()
-        
-    def serch_Data(self):
-        self.locker()
-        if self.login_array != []:
-            self.login_array.clear()
+
+    def change_size(self):
+        miim = 1
+        maam = 100
         if self.chek:
-            enter = self.ui.dateTimeEdit.text()
-            enter = enter.split(' ')
-            age = enter[0]
-            clock = enter[1]
-            age = age.split('.')
-            clock = clock.split(':')
-            unix_time = datetime.datetime(int(age[2]), int(age[1]), int(age[0]), int(clock[0]), int(clock[1]),
-                                          int(clock[2])).timestamp()
-            unix_time = int(unix_time)
-            unix_time = str(unix_time)
-            if unix_time in self.data_array:
-                self.data_array.clear()
-                self.ui.tableWidget.setRowCount(0)
-                self.UpdateTableHeader(self.save_array[0])
-                p = 0
-                value = 0
-                max = len(self.save_array[1:])
-                step = 100/max
-                for row in self.save_array[1:]:
-                    value += step
-                    self.callback_obj.progressBarUpdated.emit(value)
-                    if row[0] <= unix_time <= row[1]:
-                        self.ui.tableWidget.insertRow(self.ui.tableWidget.rowCount())
-                        for j, v in enumerate(row):
-                            if j == 3:
-                                self.login_array.append(v)
-                            it = QTableWidgetItem()
-                            it.setData(Qt.DisplayRole, v)
-                            self.ui.tableWidget.setItem(p, j, it)
-                        p += 1
-                self.callback_obj.progressBarUpdated.emit(0)
-                self.unlocker()
-                pass
-            else:
-                QMessageBox.about(self, 'Ошибка', 'Дата не найдена')
-                self.unlocker()
-        else:
-            QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл')
-            self.unlocker()
+            miim_maam0 = self.ui.comboBox_2.currentText()
+            miim_maam = miim_maam0.split(' - ')
+            miim = miim_maam[0]
+            maam = miim_maam[1]
+        return int(miim), int(maam)
 
-    def save_Data(self):
+    def change_size_butt(self):
+        miim, maam = self.change_size()
+        self.import_data(miim, maam)
+
+    def set_data(self, lenght):
         self.locker()
-        header = ['begin', 'end', 'time interval', 'login', 'mac ab', 'ULSK1', 'BRAS ip', 'start count', 'alive count',
-                  'stop count', 'incoming', 'outcoming', 'error_count', 'code 0', 'code 1011', 'code 1100', 'code -3',
-                  'code -52', 'code -42', 'code -21', 'code -40', ' code -44', 'code -46', ' code -38']
-        rowCount = self.ui.tableWidget.rowCount()
-        columCount = 24
-        d = QFileDialog.getSaveFileName(self, "Сохранение", "/analized_table",
-                                                  "Файл Microsoft Excel (*.csv)")
-        if d[0] == '':
-            QMessageBox.about(self, 'Ошибка', 'Вы отменили сохранение')
-            self.unlocker()
-            return 1
-        value = 0
-        step = 100/rowCount
-        with open(d[0], 'w', newline='') as file_csv:
-            writher = csv.writer(file_csv)
-            writher.writerow(header)
-            for i in range(rowCount):
-                save = []
-                value += step
-                self.callback_obj.progressBarUpdated.emit(value)
-                for j in range(columCount):
-                    p = self.ui.tableWidget.item(i, j).text()
-                    save.append(p)
-                writher.writerow(save)
-        self.callback_obj.progressBarUpdated.emit(0)
+        miim, maam = self.change_size()
+        count_box = self.ui.comboBox_2.count()
+        ost = lenght % 100
+        count_id = lenght - ost
+        count_id = int(count_id / 100)
+        self.import_data(miim, maam)
+        if count_box > 1:
+            self.ui.comboBox_2.clear()
+            self.ui.comboBox_2.addItem("1 - 100")
+            self.ui.comboBox_2.setCurrentIndex(0)
+        for i in range(1, count_id):
+            self.ui.comboBox_2.addItem(f"{i}01 - {i+1}00")
+        ost += count_id * 100
+        self.ui.comboBox_2.addItem(f"{count_id * 100} - {ost}")
         self.unlocker()
+        self.chek = True
 
-    def locker(self):
-        self.ui.AnalizButt.setDisabled(True)
-        self.ui.saveButt.setDisabled(True)
-        self.ui.change_cbButt.setDisabled(True)
-        self.ui.OpenButt.setDisabled(True)
-        self.ui.change_sizeButt.setDisabled(True)
-        self.ui.change_sizeLine.setDisabled(True)
-
-    def unlocker(self):
-        self.ui.AnalizButt.setDisabled(False)
-        self.ui.saveButt.setDisabled(False)
-        self.ui.change_cbButt.setDisabled(False)
-        self.ui.OpenButt.setDisabled(False)
-        self.ui.change_sizeButt.setDisabled(False)
-        self.ui.change_sizeLine.setDisabled(False)
-
-
-def read_dir(csv_files):
-    files = []
-    for i in range(len(csv_files)):
-        with open(csv_files[i], 'r') as csv_file:
-            reader = csv.reader(csv_file)
-            data = list(reader)
-        files.append(data)
-    solo_data = list.copy(files[0])
-    for i in range(1, len(files)):
-        files[i].remove(files[i][0])
-        solo_data += files[i]
-    return solo_data
+    def check_last_doc(self):
+        number = 0
+        if self.chek:
+            last_doc = new_collection.find().sort('_id', -1).limit(1)
+            for doc in last_doc:
+                one_doc = []
+                for value in doc.values():
+                    one_doc.append(value)
+                one_doc.pop(0)
+                number = one_doc[0]
+        return int(number)
 
 
 if __name__ == "__main__":
@@ -303,6 +417,3 @@ if __name__ == "__main__":
     w = Win()
     w.show()
     sys.exit(app.exec_())
-
-
-
