@@ -21,23 +21,23 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1121, 700)
+        MainWindow.resize(1050, 700)
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
         self.scrollArea = QScrollArea(MainWindow)
         self.scrollArea.setObjectName("scrollArea")
-        self.scrollArea.setGeometry(QRect(10, 10, 1100, 530))
+        self.scrollArea.setGeometry(QRect(10, 10, 1030, 530))
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1100, 530))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1030, 530))
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.tableWidget = QTableWidget(self.scrollAreaWidgetContents)
         self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setGeometry(QRect(0, 0, 1100, 530))
+        self.tableWidget.setGeometry(QRect(0, 0, 1030, 530))
         self.tableWidget.setAutoFillBackground(True)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.setColumnCount(7) 
@@ -50,7 +50,7 @@ class Ui_MainWindow(object):
 
         self.progressBar = QProgressBar(MainWindow)
         self.progressBar.setObjectName("progressBar")
-        self.progressBar.setGeometry(QRect(400, 650, 678, 28))
+        self.progressBar.setGeometry(QRect(400, 650, 640, 28))
         self.progressBar.setProperty("value", 0)
 
         self.comboBox = QComboBox(MainWindow)
