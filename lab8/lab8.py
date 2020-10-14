@@ -53,10 +53,12 @@ class Worker(QObject):
                 csv_file.seek(0)
                 reader = csv.reader(csv_file, delimiter = '|')
                 header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+                num = 0
+                res = []
                 for each in reader:
+                    num += 1
                     if self._stop:
                         break
-                    res = []
                     row = {}
                     trash = each.count('')
                     for i in range(trash):
@@ -66,10 +68,14 @@ class Worker(QObject):
                         row2 = {header[i] : each[i]}
                         row.update(row2)
                     res.append(row)
-                    new_collection.insert_many(res)
+                    if num % 100000 == 0:
+                        new_collection.insert_many(res)
+                        res = []
                     self.loaded.emit(step, f'{lenght} документов')
                     if step < lenght-1:
                         step += 1
+                if len(res) != 0:
+                    new_collection.insert_many(res)
                 step += 1
                 self.loaded.emit(step, f'{lenght} документов')
                 self.stop()
@@ -132,7 +138,7 @@ class Win(QMainWindow):
                             'background-color: rgba(27, 51, 25, 0.96); color: white; }'
                             'QComboBox {background-color: rgba(16, 74, 29, 0.96); color: white; }'
                             'QScrollBar {border: 1px black; background-color: rgba(15, 19, 20, 0.82);}'
-                            'QScrollBar:handle { background-color: rgba(19, 143, 31, 0.5); }'
+                            'QScrollBar:handle {background-color: rgba(19, 143, 31, 0.5); min-height: 30px; }'
                             'QScrollBar:up-arrow{width: 3px; height: 3px; background-color: black;}'
                             'QScrollBar:down-arrow{border: 1px black; width: 3px; height: 3px; background-color: black;}'
                             'QScrollBar:add-page {background-color: none;}'
