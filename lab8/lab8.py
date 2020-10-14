@@ -1,22 +1,17 @@
 import os
 import sys
 import csv
-import datetime
-import multiprocessing as mp
 from pymongo import MongoClient
 from widget import Ui_MainWindow
-from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject, Signal,
-    QObject, QPoint, QRect, QSize, QTime, QUrl, Qt, QThread)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
-    QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter,
-    QPixmap, QRadialGradient)
-from PySide2.QtWidgets import (QScrollArea, QWidget, QTableView, QPushButton,
-    QProgressBar, QComboBox, QApplication, QMainWindow, QAbstractItemView, 
-    QMessageBox, QTableWidgetItem, QFileDialog, QInputDialog, QLineEdit, QProgressDialog)
+from PySide2.QtCore import (Signal, QObject, Qt)
+from PySide2.QtGui import (QCursor)
+from PySide2.QtWidgets import (QScrollArea, QPushButton, QProgressBar, QComboBox, QApplication, QMainWindow, 
+    QAbstractItemView, QMessageBox, QTableWidgetItem, QFileDialog, QInputDialog, QLineEdit, QProgressDialog)
 
 client = MongoClient("localhost", 27017) 
 db = client['NEW_DB']
 test = 0
+
 new_collection = db[f'{test}']
 new_collection.drop()
 #coll = db.collection_names()
@@ -26,11 +21,9 @@ new_collection.drop()
 #    test = int(test)
 new_collection = db[f'{test}']
 
-
 class Worker(QObject):
     loaded = Signal(int, str)
     finished = Signal()
-
     def __init__(self, csv_files, b):
         super().__init__()
         self._files = csv_files
@@ -46,13 +39,12 @@ class Worker(QObject):
                     line = csv_file.readline()
                     size0 += sys.getsizeof(line)
                 lenght = size0 / 100
-                lenght = self._size / lenght
-                lenght = int(lenght)
+                lenght = int(self._size / lenght)
                 self.showProgress('Загрузка файлов', lenght, self.stop)
                 self.loaded.connect(self.updateProgress) 
                 csv_file.seek(0)
                 reader = csv.reader(csv_file, delimiter = '|')
-                header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+                header = ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
                 num = 0
                 res = []
                 for each in reader:
@@ -63,10 +55,13 @@ class Worker(QObject):
                     trash = each.count('')
                     for i in range(trash):
                         each.remove('')
-                    for i in range(7):
-                        row2 = {}
-                        row2 = {header[i] : each[i]}
-                        row.update(row2)
+                    try:
+                        for i in range(7):
+                            row2 = {}
+                            row2 = {header[i] : each[i]}
+                            row.update(row2)
+                    except IndexError:
+                        pass
                     res.append(row)
                     if num % 100000 == 0:
                         new_collection.insert_many(res)
@@ -104,7 +99,6 @@ class SyncObj(QObject):
     tableUpdatedRow = Signal((int, int, list))
     tableUpdatedHeader = Signal(int)
 
-
 class Win(QMainWindow):
     def __init__(self, parent=None):
         super(Win, self).__init__()
@@ -120,7 +114,6 @@ class Win(QMainWindow):
         self.ui.saveButt.clicked.connect(self.save_Data)
         self.ui.DeleteButt.clicked.connect(self.delete_data)
         self.ui.UpdateButt.clicked.connect(self.update_data)
-        self.my_pool = mp.Pool(1)
         self.callback_obj = SyncObj()
         self.callback_obj.progressBarUpdated.connect(self.ui.progressBar.setValue)
         self.callback_obj.tableUpdatedRow.connect(self.UpdateTableRow)
@@ -393,17 +386,14 @@ class Win(QMainWindow):
             self.unlocker()
 
     def change_size(self):
-        miim = 1
-        maam = 100
+        miim, maaa = 1, 100
         if self.chek:
             try:
                 miim_maam0 = self.ui.comboBox_2.currentText()
                 miim_maam = miim_maam0.split(' - ')
-                miim = miim_maam[0]
-                maam = miim_maam[1]
+                miim, maam = miim_maam[0], miim_maam[1]
             except IndexError:
-                miim = 1
-                maam = 100
+                miim, maaa = 1, 100
                 pass
         return int(miim), int(maam)
 
@@ -442,7 +432,6 @@ class Win(QMainWindow):
                 one_doc.pop(0)
                 number = one_doc[0]
         return int(number)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
