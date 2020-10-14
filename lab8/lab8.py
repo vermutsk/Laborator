@@ -162,6 +162,7 @@ class Win(QMainWindow):
 
     def locker1(self):
         self.ui.AnalizButt.setDisabled(True)
+
     def unlocker2(self):
         self.ui.AnalizButt.setDisabled(False)
 
@@ -213,31 +214,34 @@ class Win(QMainWindow):
 
     #Save
     def save_Data(self):
-        self.locker()
-        header = ['№', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
-        rowCount = self.ui.tableWidget.rowCount()
-        columCount = 7
-        d = QFileDialog.getSaveFileName(self, "Сохранение", "/analized_table",
-                                                "Файл Microsoft Excel (*.csv)")
-        if d[0] == '':
-            QMessageBox.about(self, 'Ошибка', 'Вы отменили сохранение')
+        if self.chek:
+            self.locker()
+            header = ['№', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
+            rowCount = self.ui.tableWidget.rowCount()
+            columCount = 7
+            d = QFileDialog.getSaveFileName(self, "Сохранение", "/analized_table",
+                                                    "Файл Microsoft Excel (*.csv)")
+            if d[0] == '':
+                QMessageBox.about(self, 'Ошибка', 'Вы отменили сохранение')
+                self.unlocker()
+                return 1
+            value = 0
+            step = 100/rowCount
+            with open(d[0], 'w', newline='') as file_csv:
+                writher = csv.writer(file_csv, delimiter = '|')
+                writher.writerow(header)
+                for i in range(rowCount):
+                    save = []
+                    value += step
+                    self.callback_obj.progressBarUpdated.emit(value)
+                    for j in range(columCount):
+                        p = self.ui.tableWidget.item(i, j).text()
+                        save.append(p)
+                    writher.writerow(save)
+            self.callback_obj.progressBarUpdated.emit(0)
             self.unlocker()
-            return 1
-        value = 0
-        step = 100/rowCount
-        with open(d[0], 'w', newline='') as file_csv:
-            writher = csv.writer(file_csv, delimiter = '|')
-            writher.writerow(header)
-            for i in range(rowCount):
-                save = []
-                value += step
-                self.callback_obj.progressBarUpdated.emit(value)
-                for j in range(columCount):
-                    p = self.ui.tableWidget.item(i, j).text()
-                    save.append(p)
-                writher.writerow(save)
-        self.callback_obj.progressBarUpdated.emit(0)
-        self.unlocker()
+        else:
+            QMessageBox.about(self, 'Ошибка', 'Проанализируйте файл.')
 
     #Open
     def openButt(self):
