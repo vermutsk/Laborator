@@ -27,11 +27,6 @@ new_collection.drop()
 new_collection = db[f'{test}']
 
 
-class SyncObj(QObject):
-    progressBarUpdated = Signal(int)
-    tableUpdatedRow = Signal((int, int, list))
-    tableUpdatedHeader = Signal(int)
-
 class Worker(QObject):
     loaded = Signal(int, str)
     finished = Signal()
@@ -77,6 +72,7 @@ class Worker(QObject):
                         step += 1
                 step += 1
                 self.loaded.emit(step, f'{lenght} документов')
+                self.stop()
         self.finished.emit()
 
     def updateProgress(self, count, file):
@@ -95,6 +91,12 @@ class Worker(QObject):
         lenght = new_collection.find().count()
         w.set_data(lenght)
         self._stop = True
+
+
+class SyncObj(QObject):
+    progressBarUpdated = Signal(int)
+    tableUpdatedRow = Signal((int, int, list))
+    tableUpdatedHeader = Signal(int)
 
 
 class Win(QMainWindow):
@@ -117,15 +119,24 @@ class Win(QMainWindow):
         self.callback_obj.progressBarUpdated.connect(self.ui.progressBar.setValue)
         self.callback_obj.tableUpdatedRow.connect(self.UpdateTableRow)
         self.callback_obj.tableUpdatedHeader.connect(self.UpdateTableHeader)
-        self.setStyleSheet('QMainWindow { background-color: rgba(15, 19, 20, 0.82); color: white;} '
+        self.setStyleSheet('QMainWindow { background-color: rgba(15, 19, 20, 0.82); color: white;}' 
+                            'QScrollArea {border : 1px black; }'
                             'QTableWidget {background-color: rgba(15, 19, 20, 0.82); color: white; '
                             'border: 2px solid rgba(11, 33, 38, 0.96);  gridline-color: rgba(16, 74, 29, 0.96);'
                             'selection-background-color: rgba(13, 99, 5, 0.96); } '
+                            'QHeaderView {background-color: rgba(15, 19, 20, 0.82); color: white; }'
+                            'QHeaderView:section {background-color: rgba(15, 19, 20, 0.2); color: white; }'
                             'QPushButton { background-color: rgba(16, 74, 29, 0.96); color: white; }'
                             'QProgressBar:chunk {background-color: rgba(34, 242, 15, 0.96); }'
                             'QProgressBar { text-align: center; border: 2px solid rgba(11, 33, 38, 0.96); border-radius: 5px;'
                             'background-color: rgba(27, 51, 25, 0.96); color: white; }'
-                            'QComboBox {background-color: rgba(16, 74, 29, 0.96); color: white; }')
+                            'QComboBox {background-color: rgba(16, 74, 29, 0.96); color: white; }'
+                            'QScrollBar {border: 1px black; background-color: rgba(15, 19, 20, 0.82);}'
+                            'QScrollBar:handle { background-color: rgba(16, 74, 29, 0.5); }'
+                            'QScrollBar:up-arrow{width: 3px; height: 3px; background-color: black;}'
+                            'QScrollBar:down-arrow{border: 1px black; width: 3px; height: 3px; background-color: black;}'
+                            'QScrollBar:add-page {background-color: none;}'
+                            'QScrollBar:sub-page {background-color: none;}')
 
     def locker(self):
         self.ui.AnalizButt.setDisabled(True)
@@ -142,6 +153,11 @@ class Win(QMainWindow):
         self.ui.DeleteButt.setDisabled(False)
         self.ui.UpdateButt.setDisabled(False)
         self.ui.OpenBox.setDisabled(False)
+
+    def locker1(self):
+        self.ui.AnalizButt.setDisabled(True)
+    def unlocker2(self):
+        self.ui.AnalizButt.setDisabled(False)
 
     #Delete
     def delete_data(self):
@@ -225,6 +241,7 @@ class Win(QMainWindow):
             open_file = fileD.getExistingDirectory(self)
             self.ui.PathFile.setText('')
             self.ui.PathFile.setText(open_file)
+            self.unlocker2()
         elif id ==2:
             str0, ok = QInputDialog.getText(self, "Ввод параметра", "Введите данные в виде: name|fname|phone|uid|nik|wo", QLineEdit.Normal,'')
             if str0 and ok:
@@ -244,10 +261,10 @@ class Win(QMainWindow):
                     res.append(row)
                     new_collection.insert_many(res)
                     if number + 1 <= 100:
-                        data.pop(0)
                         self.callback_obj.tableUpdatedRow.emit(number, 0, data)
                     else:
-                        pass
+                        lenght = new_collection.find().count()
+                        self.set_data(lenght)
                     self.chek = True
                 else:
                     QMessageBox.about(self, 'Ошибка', 'Неверный формат данных')
@@ -270,7 +287,6 @@ class Win(QMainWindow):
 
     def analizButt(self):
         self.locker()
-        self.locker()
         way_file = self.ui.PathFile.text()
         if os.path.exists(way_file) is False:
             QMessageBox.about(self, 'Ошибка', 'Введите путь')
@@ -286,13 +302,13 @@ class Win(QMainWindow):
                 sp_file = list_dir[i].split('.')
                 if sp_file[-1] == 'txt':
                     csv_files.append(get_path)
-
         if len(csv_files) == 0:
             QMessageBox.about(self, 'Ошибка', 'Не найденны txt файлы')
             self.unlocker()
         b = os.path.getsize(get_path)
         self.worker = Worker(csv_files, b)
         self.worker.run()
+        self.locker1()
 
     def import_data(self, miim, maam):
         step = 0
@@ -382,7 +398,7 @@ class Win(QMainWindow):
 
     def set_data(self, lenght):
         self.locker()
-        miim, maam = self.change_size()
+        miim, maam = 1, 100
         count_box = self.ui.comboBox_2.count()
         ost = lenght % 100
         count_id = lenght - ost
@@ -395,7 +411,8 @@ class Win(QMainWindow):
         for i in range(1, count_id):
             self.ui.comboBox_2.addItem(f"{i}01 - {i+1}00")
         ost += count_id * 100
-        self.ui.comboBox_2.addItem(f"{count_id * 100} - {ost}")
+        if ost != count_id * 100:
+            self.ui.comboBox_2.addItem(f"{count_id * 100} - {ost}")
         self.unlocker()
         self.chek = True
 
