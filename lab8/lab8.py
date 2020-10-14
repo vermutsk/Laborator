@@ -50,7 +50,7 @@ class Worker(QObject):
                 lenght = int(lenght)
                 self.showProgress('Загрузка файлов', lenght, self.stop)
                 self.loaded.connect(self.updateProgress) 
-            with open(self._files[i], 'r') as csv_file:
+                csv_file.seek(0)
                 reader = csv.reader(csv_file, delimiter = '|')
                 header= ['number', 'name', 'fname', 'phone', 'uid', 'nik', 'wo']
                 for each in reader:
@@ -132,7 +132,7 @@ class Win(QMainWindow):
                             'background-color: rgba(27, 51, 25, 0.96); color: white; }'
                             'QComboBox {background-color: rgba(16, 74, 29, 0.96); color: white; }'
                             'QScrollBar {border: 1px black; background-color: rgba(15, 19, 20, 0.82);}'
-                            'QScrollBar:handle { background-color: rgba(16, 74, 29, 0.5); }'
+                            'QScrollBar:handle { background-color: rgba(19, 143, 31, 0.5); }'
                             'QScrollBar:up-arrow{width: 3px; height: 3px; background-color: black;}'
                             'QScrollBar:down-arrow{border: 1px black; width: 3px; height: 3px; background-color: black;}'
                             'QScrollBar:add-page {background-color: none;}'
@@ -386,10 +386,15 @@ class Win(QMainWindow):
         miim = 1
         maam = 100
         if self.chek:
-            miim_maam0 = self.ui.comboBox_2.currentText()
-            miim_maam = miim_maam0.split(' - ')
-            miim = miim_maam[0]
-            maam = miim_maam[1]
+            try:
+                miim_maam0 = self.ui.comboBox_2.currentText()
+                miim_maam = miim_maam0.split(' - ')
+                miim = miim_maam[0]
+                maam = miim_maam[1]
+            except IndexError:
+                miim = 1
+                maam = 100
+                pass
         return int(miim), int(maam)
 
     def change_size_butt(self):
