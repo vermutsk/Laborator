@@ -36,6 +36,7 @@ class Config():
                 doc.write(self.data)
         check = BASE_URL + f'secure.checkToken?access_token={self.ACS_TOK}&client_secret={self.SECRET}&v=5.21&client_id={self.APP_ID}&token={self.data}'
         load = requests.get(check).json()
+        print(load)
         if load['response']['success'] != 1:
             return False
         else:
