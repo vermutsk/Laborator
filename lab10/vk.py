@@ -76,15 +76,6 @@ else:
         friends_id = ''
         for i in range(friend_count):
             friends_id += str(friends[i]) + ','
-        if friend_count > 1000:
-            n = friend_count // 1000
-            ost = friend_count % 1000
-            for i in range(1, n):
-                miin = i*1000
-                maax = miin + 999
-                get_user_info(friends_id[miin:maax])
-                time.sleep(2)
-        else:
-            get_user_info(friends_id)
+        get_user_info(friends_id)
     except Exception:
         pass
