@@ -57,4 +57,4 @@ class Config():
             
 
 config = Config()
-IMPLICIT_URL = f'https://oauth.vk.com/authorize?client_id={config.APP_ID}&display=page&redirect_uri={REDIRECT_URI}&scope=friends&response_type=token&v=5.124'
+IMPLICIT_URL = f'https://oauth.vk.com/authorize?client_id={config.APP_ID}&display=page&redirect_uri={REDIRECT_URI}&scope=friends,offline&response_type=token&v=5.124'
