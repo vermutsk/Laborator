@@ -31,7 +31,7 @@ def evklid(x, y):
     while y != 0:
         q = x // y
         r = x - (q*y)
-        a = a2 = (q*a1)
+        a = a2 - (q*a1)
         b = b2 - (q*b1)
         x = y
         y = r
@@ -39,9 +39,9 @@ def evklid(x, y):
         a1 = a
         b2 = b1
         b1 = b
-        m = x
-        a = a2
-        b = b2
+    m = x
+    a = a2
+    b = b2
     return m, a, b
 
 def to_bin(n):
@@ -130,16 +130,14 @@ def simple():
         except Exception:
             print('Ошибка')
 
-def ferma():
-    n, a = simple()
+def ferma(n, a):
     r = pow(a, n-1, n)
     if r == 1:
         print('Число, вероятно, простое')
     else:
         print('Число составное')
 
-def shtrassen():
-    n, a = simple()
+def shtrassen(n, a):
     k = (n-1)//2
     print(a, n, k)
     r = pow(a, k, n)
@@ -153,8 +151,7 @@ def shtrassen():
         ans = 'Число составное'
     return ans
 
-def miller():
-    n, a = simple()
+def miller(n, a):
     r = n-1
     s = 0
     while r%2 == 0:
@@ -167,16 +164,131 @@ def miller():
         while j <= s-1 and y != n-1:
             y = pow(y, 2, n)
             if y==1:
-                print('Число составное')
-                return 0
+                
+                return False
             j += 1
         if y!= n-1:
-            print('Число составное')
-            return 0
-    print('Число, вероятно, простое')
+            return False
+    return True
 
 def gen_simple():
-    pass
+    ready = True
+    while ready:
+        flag = True
+        while flag:
+            k = int(input('Введите разрядность: '))
+            t = int(input('Введите параметр: '))
+            if k > 0 and t >= 1:
+                flag = False
+        p = '1'
+        for i in range(1,k-1):
+            n = random.randint(0, 1)
+            p += f'{n}'
+        p += '1'
+        p0 = 0
+        for i in range(k-1, -1, -1):
+            if p[i] == '1':
+                p0 += 2**(k-i-1)
+        p0 = int(p0)
+        flag = True
+        for i in range(1, t+1):
+            a = random.randint(2, p0-2)
+            if miller(p0, a) == False:
+                flag = False
+                break
+        if flag == True:
+            print(p0)
+            return 0
+
+def compair_1():
+    a = int(input('Введите a: '))
+    b = int(input('Введите b: '))
+    m = int(input('Введите m: '))
+    d, l, a0 = evklid(a, m) 
+    if b%d != 0:
+        print('Решений нет')
+        return False
+    if d != 1:
+        a1 = a/d
+        b1 = b/d
+        m1 = m/d
+        k, l, a01= evklid(a1, m1)
+        x0 = a01*b1%m1
+        print('x0 =', x0)
+    else:
+        x = a0*b%m
+        print('x =', x)
+        return True
+    for i in range(1, d-1):
+        t = x0 + (i*m1)
+        print(f', x{i} =', t) 
+
+#НЕ РАБОТАТЕТ..............................................................................
+def compair_2():
+    flag = True
+    while flag:
+        p = int(input('Введите p: '))
+        if p > 2:
+            a = random.randint(1, p-2)
+            if miller(p, a)==True:
+                a = int(input('Введите a: '))
+                N = int(input('Введите N: '))
+                if yakobi(p, a)==1 and yakobi(p, N)==-1:
+                    flag = False
+    h=p-1
+    k=0
+    while h%2 == 0:
+        k+=1
+        h = h/2
+    a1 = a**((h+1)/2)%p
+    g, z, a2 = evklid(p, a) 
+    N1 = N**h%p
+    N2 = 1
+    j = 1
+    for i in range(k-1):
+        b = a1*N2%p
+        c = a2*(b**2)%p
+        d = c**(k-2-i)%p
+        print(b, c, d)
+        if d == 1:
+            j = 0
+        elif d == -1:
+            j = 1
+        N2 = N2*(N1**(2**i*j))%p
+        print(N2, N1, i, j)
+    x = a1*N2%p
+    print(x, x*(-1))
+
+def compair_system():
+    flag = True
+    while flag:
+        n = int(input('Введите количество уравнений в системе: '))
+        b = []
+        m = []
+        for i in range(n):
+            b_i = int(input(f'Введите b{i}: '))
+            m_i = int(input(f'Введите m{i}: '))
+            b.append(b_i)
+            m.append(m_i)
+        for i in range(0, n-1):
+            d, k, l = evklid(m[i], m[i+1])
+            if d == 1:
+                flag = False
+            else:
+                flag = True
+                break
+    M = m[0]
+    for i in range(1, n):
+        M *= m[i]
+        print(M)
+    x=0
+    for j in range(n):
+        M_j = M/m[j]
+        k,l, N = evklid(M_j, m[j]) 
+        x += b[j]*N*M_j
+        print(k, M_j, N*M_j, M_j*l, x)
+    x = x%M
+    print(x)
 
 
 #././././././././././././././././././././././././.Меню./././././././././././././././././././././././././././././.
@@ -188,7 +300,7 @@ while flag:
         print("\nГлавное меню:")
         choice = int(input("\n1) Обобщенный (расширенный) алгоритм Евклида\n2) Алгоритм быстрого возведения в степень по модулю\
             \n3) Вычисление символа Якоби\n4) Алгоритмы проверки чисел на простоту \n5) Генерация простого числа заданной размерности\
-            \n6) Выйти из программы\nВыбор: "))
+            \n6) Решение сравнения первой степени\n7) Решение сравнения второй степени\n8) Решение системы уравнений\n9) Выйти из программы\nВыбор: "))
         
         if choice==1: 
             er=0
@@ -248,12 +360,18 @@ while flag:
             choice1 = int(input("\n1) Тест Ферма\n2) Тест Соловэя-Штрассена\
             \n3) Тест Миллера-Рабина \n4) Вернуться\nВыбор: "))
             if choice1 == 1:
-                ferma()
+                n, a = simple()
+                ferma(n, a)
             elif choice1 == 2:
-                ans = shtrassen()
+                n, a = simple()
+                ans = shtrassen(n, a)
                 print(ans)
             elif choice1 == 3:
-                miller()
+                n, a = simple()
+                if miller(n, a) == True:
+                    print('Число, вероятно, простое')
+                else:
+                    print('Число составное')
             elif choice1 == 4:
                 break
             else:
@@ -265,10 +383,18 @@ while flag:
                     break
 
         elif choice==5:
-            pass
+            gen_simple()
         
         elif choice==6:
-            flag==False
+            compair_1()
+
+        elif choice==7:
+            compair_2()
+
+        elif choice==8:
+            compair_system()
+        elif choice == 9:
+            flag = False
             break
 
         else:
@@ -283,10 +409,10 @@ while flag:
         print("SyntaxError")
     except KeyboardInterrupt:
         pass
-    #except TypeError:
-    #    print("TypeError")
-    #except UnboundLocalError:
-    #    print("Возникла ошибка")
+    except TypeError:
+        print("TypeError")
+    except UnboundLocalError:
+        print("Возникла ошибка")
     #except IndexError:
     #    print("IndexError")
     #except ValueError:
