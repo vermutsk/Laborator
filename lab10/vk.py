@@ -5,7 +5,7 @@ import webbrowser
 import config
 from pymongo import MongoClient
 
-#323367571   261645081
+#323367571   261645081   180148826
 client = MongoClient("localhost", 27017) 
 db = client['NEW_DB']
 new_collection = db['vk_riend_list']
