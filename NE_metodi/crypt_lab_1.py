@@ -42,7 +42,8 @@ def evklid(x, y):
     m = x
     a = a2
     b = b2
-    return m, a, b
+    l = [m, a, b]
+    return l
 
 def to_bin(n):
     n = bin(n)
@@ -91,8 +92,8 @@ def mod_exponentiating():
     print(x)
 
 def yakobi(n, a):
-    m, l, b = evklid(n, a)
-    if m != 1:
+    m = evklid(n, a)
+    if m[0] != 1:
         return 0
     g = 1
     if a < 0:
@@ -204,26 +205,25 @@ def compair_1():
     a = int(input('Введите a: '))
     b = int(input('Введите b: '))
     m = int(input('Введите m: '))
-    d, l, a0 = evklid(a, m) 
-    if b%d != 0:
+    d = evklid(a, m) 
+    if b%d[0] != 0:
         print('Решений нет')
         return False
-    if d != 1:
-        a1 = a/d
-        b1 = b/d
-        m1 = m/d
-        k, l, a01= evklid(a1, m1)
-        x0 = a01*b1%m1
+    if d[0] != 1:
+        a1 = a/d[0]
+        b1 = b/d[0]
+        m1 = m/d[0]
+        a01= evklid(a1, m1)
+        x0 = a01[2]*b1%m1
         print('x0 =', x0)
     else:
-        x = a0*b%m
+        x = d[2]*b%m
         print('x =', x)
         return True
     for i in range(1, d-1):
-        t = x0 + (i*m1)
+        t = int(x0 + (i*m1))
         print(f', x{i} =', t) 
 
-#НЕ РАБОТАТЕТ..............................................................................
 def compair_2():
     flag = True
     while flag:
@@ -239,23 +239,21 @@ def compair_2():
     k=0
     while h%2 == 0:
         k+=1
-        h = h/2
-    a1 = a**((h+1)/2)%p
-    g, z, a2 = evklid(p, a) 
-    N1 = N**h%p
+        h = int(h/2)
+    a1 = pow(a, int((h+1)/2), p)
+    a2 = evklid(a, p) 
+    N1 = pow(N, h, p)
     N2 = 1
-    j = 1
+    j = 0
     for i in range(k-1):
         b = a1*N2%p
-        c = a2*(b**2)%p
-        d = c**(k-2-i)%p
-        print(b, c, d)
+        c = a2[2]*(b**2)%p
+        d = pow(c, k-2-i, p)
         if d == 1:
             j = 0
         elif d == -1:
             j = 1
-        N2 = N2*(N1**(2**i*j))%p
-        print(N2, N1, i, j)
+        N2 *= pow(N1, (2**i)*j, p)
     x = a1*N2%p
     print(x, x*(-1))
 
@@ -271,8 +269,8 @@ def compair_system():
             b.append(b_i)
             m.append(m_i)
         for i in range(0, n-1):
-            d, k, l = evklid(m[i], m[i+1])
-            if d == 1:
+            d = evklid(m[i], m[i+1])
+            if d[0] == 1:
                 flag = False
             else:
                 flag = True
@@ -280,14 +278,12 @@ def compair_system():
     M = m[0]
     for i in range(1, n):
         M *= m[i]
-        print(M)
     x=0
     for j in range(n):
         M_j = M/m[j]
-        k,l, N = evklid(M_j, m[j]) 
-        x += b[j]*N*M_j
-        print(k, M_j, N*M_j, M_j*l, x)
-    x = x%M
+        N = evklid(M_j, m[j]) 
+        x += b[j]*N[2]*M_j
+    x = int(x%M)
     print(x)
 
 
@@ -413,7 +409,7 @@ while flag:
         print("TypeError")
     except UnboundLocalError:
         print("Возникла ошибка")
-    #except IndexError:
-    #    print("IndexError")
-    #except ValueError:
-    #    print("ValueError") 
+    except IndexError:
+        print("IndexError")
+    except ValueError:
+        print("ValueError") 
