@@ -128,5 +128,5 @@ def create_reply_keyboard_1():
     butt_list = ['Фамилия', 'Имя', 'Отчество', 'Кабинет', 'Телефон', 'Email']
     board_5 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).insert(KeyboardButton('Должность'))
     for i in butt_list:
-        board_5.insert(KeyboardButton(f'{i}'))
+        board_5.insert(KeyboardButton(i))
     return board_5
