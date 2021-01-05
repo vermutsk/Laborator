@@ -111,6 +111,7 @@ def create_inline_keyboard():
     full = db_list(js)
     board_2 = InlineKeyboardMarkup().add(InlineKeyboardButton(f'{full[0][0]}', callback_data=f'btn{0}'))
     for i in range(1, lenght):
+        print(lenght, i)
         board_2.add(InlineKeyboardButton(f'{full[i][0]}', callback_data=f'btn{i}'))
     return board_2
 
@@ -124,7 +125,3 @@ def create_reply_keyboard():
         board_4.insert(KeyboardButton(f'{i}'))
     return board_4
     
-def create_reply_keyboard_1():
-    board_5 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).insert(KeyboardButton('Должность'), KeyboardButton('Фамилия'))
-    board_5.insert(KeyboardButton('Имя'), KeyboardButton('Отчество'), KeyboardButton('Кабинет'), KeyboardButton('Телефон'), KeyboardButton('Email'))
-    return board_5
