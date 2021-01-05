@@ -38,7 +38,6 @@ def update_db(pers):
     driver.get(link)
     results = []
     tmp = {}
-
     name = driver.find_elements_by_class_name('author-name')
     if len(name) == 0:
         name = driver.find_elements_by_class_name('helpers-title')
@@ -47,15 +46,15 @@ def update_db(pers):
         else:
             name  = name[0].text
             name = name.split(' ')
-            tmp['fname'] = name[0]
-            tmp['name'] = name[1]
-            tmp['mail'] = name[2]
+            tmp['Fname'] = name[0]
+            tmp['Name'] = name[1]
+            tmp['Oname'] = name[2]
     else:
         name  = name[0].text
         name = name.split(' ')
-        tmp['fname'] = name[0]
-        tmp['name'] = name[1]
-        tmp['mail'] = name[2]
+        tmp['Fname'] = name[0]
+        tmp['Name'] = name[1]
+        tmp['Oname'] = name[2]
 
     dolj = driver.find_elements_by_class_name('author-dolj')
     if len(dolj) == 0:
@@ -66,28 +65,28 @@ def update_db(pers):
             dolj = dolj[0].text
     else:
         dolj = dolj[0].text
-    tmp['dolj'] = dolj
+    tmp['doljname'] = dolj
 
     adress = driver.find_elements_by_class_name('block-address')
     if len(adress) == 0:
         adress = ''
     else:
         adress = adress[0].text
-    tmp['adress'] = adress
+    tmp['Room'] = adress
 
     phone = driver.find_elements_by_class_name('block-phone')
     if len(phone) == 0:
         phone = ''
     else:
         phone = phone[0].text
-    tmp['phone'] = phone
+    tmp['Phone'] = phone
 
     email = driver.find_elements_by_class_name('block-email')
     if len(email) == 0:
         email = ''
     else:
         email = email[0].text
-    tmp['email'] = email
+    tmp['Mail'] = email
 
     results.append(tmp)
     new_collection.insert_many(results)
@@ -108,7 +107,7 @@ def db_list(js):
 
 def create_inline_keyboard():
     lenght = new_collection.find().count()
-    js = new_collection.find({}, { 'dolj' : 1, '_id' : 0})
+    js = new_collection.find({}, { 'doljname' : 1, '_id' : 0})
     full = db_list(js)
     board_2 = InlineKeyboardMarkup().add(InlineKeyboardButton(f'{full[0][0]}', callback_data=f'btn{0}'))
     for i in range(1, lenght):
@@ -116,18 +115,18 @@ def create_inline_keyboard():
     return board_2
 
 def create_reply_keyboard():
-    lenght = new_collection.find().count()
+    lenght = adm_collection.find().count()
     if lenght >= 4:
         board_4 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=4).insert(KeyboardButton('1'))
     else:
         board_4 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).insert(KeyboardButton('1'))
-    for i in range(1, lenght):
+    for i in range(2, lenght+1):
         board_4.insert(KeyboardButton(f'{i}'))
     return board_4
     
 def create_reply_keyboard_1():
-    butt_list = ['Имя', 'Отчество', 'Должность', 'Кабинет', 'Телефон', 'Email']
-    board_5 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).insert(KeyboardButton('Фамилия'))
+    butt_list = ['Фамилия', 'Имя', 'Отчество', 'Кабинет', 'Телефон', 'Email']
+    board_5 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).insert(KeyboardButton('Должность'))
     for i in butt_list:
         board_5.insert(KeyboardButton(f'{i}'))
     return board_5
