@@ -9,8 +9,8 @@ from aiogram.contrib.fsm_storage.mongo import MongoStorage
 from aiogram.utils.markdown import text, bold, code
 from aiogram.types import ParseMode, ReplyKeyboardRemove
 
-from keyboard import board_1, board_3
-from functions import parser, db_list, create_inline_keyboard, create_reply_keyboard, create_reply_keyboard_1
+from keyboard import board_1, board_3, board_5
+from functions import parser, db_list, create_inline_keyboard, create_reply_keyboard
 from config import TOKEN, MAIN_DB, ADMIN_DB, PASSWORD
 
 client = MongoClient("localhost", 27017) 
@@ -81,7 +81,7 @@ async def admin(msg: types.Message, state: FSMContext):
     if text == 'Создать':
         if fio == '':
             await state.set_state(States.FIO)
-            await msg.reply('Введи фио')
+            await msg.reply('Введи фамилию, имя и отчество через пробелы')
             return
     elif text == 'Изменить':
         board_4 = create_reply_keyboard()
@@ -107,7 +107,7 @@ async def admin(msg: types.Message, state: FSMContext):
         for doc in docs:
             if 'admin_id' in doc:
                 if doc['admin_id'] == user_id:
-                    adm_collection.update({'doljname' : doc[doljname]}, {'$unset': {'admin_id' : 1}})
+                    adm_collection.update_one({'doljname' : doc[doljname]}, {"$unset": {'admin_id' : 1}})
                 doc.pop['admin_id']
             full.append(doc)
         new_collection.insert_many(full)
@@ -164,7 +164,6 @@ async def email(msg: types.Message, state: FSMContext):
 @dp.message_handler(state=States.CHANGE, content_types=['text'])
 async def change(msg: types.Message, state: FSMContext):
     text = msg.text
-    board_5 = create_reply_keyboard_1
     if  text.isdigit():
         code = int(text)
         #проверка по id
@@ -176,7 +175,7 @@ async def change(msg: types.Message, state: FSMContext):
                 await bot.send_message(msg.from_user.id, 'Редактирование сейчас недоступно, выберите другого человека', reply_markup=board_4)
                 return
         else:
-            adm_collection.update({'doljname' : full[0][0]}, {'$set': {'admin_id' : user_id}})
+            adm_collection.update_one({'doljname' : full[0][0]}, {"$set": {'admin_id' : user_id}})
         await state.update_data(code=text)
         full_text = ''
         for elem in full:
@@ -193,6 +192,7 @@ async def change(msg: types.Message, state: FSMContext):
         key_list = ['doljname', 'Fname', 'Name', 'Oname', 'Room', 'Phone' 'Mail']
         for i in range(len(butt_list)):
             if text == butt_list[i]:
+                #наличие code
                 await state.update_data(text=i)
                 await bot.send_message(msg.from_user.id, "Введи новое значение")
                 return
@@ -202,7 +202,7 @@ async def change(msg: types.Message, state: FSMContext):
             num = int(data['text'])
             change = adm_collection.find().skip(code-1).limit(1)
             full = db_list(change)
-            adm_collection.update({'doljname' : full[0][0], 'Fname' : full[0][1]}, {'$set': {key_list[num] : text}})
+            adm_collection.update_one({'doljname' : full[0][0], 'Fname' : full[0][1]}, {"$set": {key_list[num] : text}})
             await state.set_state(States.ADMIN)
             await bot.send_message(msg.from_user.id, "Если это все, что ты хотел - жми 'Сохранить', ну или выбирай, что будем делать", reply_markup=board_3)
         else:
@@ -231,8 +231,6 @@ async def echo(msg: types.Message, state: FSMContext):
             await bot.send_message(msg.from_user.id, full_text)
     elif text == PASSWORD:
         await state.set_state(States.ADMIN)
-        check = await state.get_state()
-        print(check)
         await bot.send_message(msg.from_user.id, "Теперь ты админ, что будем делать?", reply_markup=board_3)
     else:
         await bot.send_message(msg.from_user.id, 'Я не знаю таких слов')
