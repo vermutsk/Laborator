@@ -86,13 +86,13 @@ async def admin(msg: types.Message, state: FSMContext):
     elif text == 'Изменить':
         board_4 = create_reply_keyboard()
         await state.set_state(States.CHANGE)
-        js = new_collection.find({}, { 'doljname' : 1, '_id' : 0})
+        js = adm_collection.find({}, { 'doljname' : 1, '_id' : 0})
         full = db_list(js)
         g = 1
+        full_text = ''
         for elem in full:
-            full_text = ''
             for i in elem:
-                full_text += f'{g}' + ' ' + i + '\n'
+                full_text += f'{g}' + '. ' + i + '\n'
                 g += 1
         await bot.send_message(msg.from_user.id, full_text)
         await bot.send_message(msg.from_user.id, "Это весь список, кого будем редактировать?", reply_markup=board_4)
@@ -119,9 +119,9 @@ async def fio(msg: types.Message, state: FSMContext):
     fio = msg.text
     fio = fio.split(' ')
     await state.set_state(States.ADMIN)
-    await state.update_data(fname=fio[0])
-    await state.update_data(name=fio[1])
-    await state.update_data(mail=fio[2])
+    await state.update_data(Fname=fio[0])
+    await state.update_data(Name=fio[1])
+    await state.update_data(Oname=fio[2])
     await state.set_state(States.DOLJ)
     await bot.send_message(msg.from_user.id, "Введи должность:" )
 
@@ -129,7 +129,7 @@ async def fio(msg: types.Message, state: FSMContext):
 async def dolj(msg: types.Message, state: FSMContext):
     dolj = msg.text
     await state.set_state(States.ADMIN)
-    await state.update_data(dolj=dolj)
+    await state.update_data(doljname=dolj)
     await state.set_state(States.ADRESS)
     await bot.send_message(msg.from_user.id, "Введи кабинет: ")
 
@@ -137,7 +137,7 @@ async def dolj(msg: types.Message, state: FSMContext):
 async def adress(msg: types.Message, state: FSMContext):
     adress = msg.text
     await state.set_state(States.ADMIN)
-    await state.update_data(adress=adress)
+    await state.update_data(Room=adress)
     await state.set_state(States.PHONE)
     await bot.send_message(msg.from_user.id, "Введи телефон: ")
 
@@ -145,7 +145,7 @@ async def adress(msg: types.Message, state: FSMContext):
 async def phone(msg: types.Message, state: FSMContext):
     phone = msg.text
     await state.set_state(States.ADMIN)
-    await state.update_data(phone=phone)
+    await state.update_data(Phone=phone)
     await state.set_state(States.EMAIL)
     await bot.send_message(msg.from_user.id, "Введи email: ")
 
@@ -153,7 +153,7 @@ async def phone(msg: types.Message, state: FSMContext):
 async def email(msg: types.Message, state: FSMContext):
     email = msg.text
     await state.set_state(States.ADMIN)
-    await state.update_data(email=email)
+    await state.update_data(Mail=email)
     user_data = await state.get_data()
     results = []
     results.append(user_data)
@@ -176,7 +176,7 @@ async def change(msg: types.Message, state: FSMContext):
                 await bot.send_message(msg.from_user.id, 'Редактирование сейчас недоступно, выберите другого человека', reply_markup=board_4)
                 return
         else:
-            adm_collection.update({'doljname' : full[0][0]}, {'$set': {admin_id : user_id}})
+            adm_collection.update({'doljname' : full[0][0]}, {'$set': {'admin_id' : user_id}})
         await state.update_data(code=text)
         full_text = ''
         for elem in full:
