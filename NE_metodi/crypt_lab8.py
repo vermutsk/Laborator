@@ -49,14 +49,13 @@ def gamal():
     r2 = pow(r, -1, p-1)
     delta = ((hesh-alpha*gamma)*r2)%(p-1)
 
-    print(power(beta, gamma, p), power(gamma, delta, p))
-    print(power(beta, gamma, p)*power(gamma, delta, p)%p, power(alpha, hesh, p))
+    print('beta*gamma=', power(beta, gamma, p);'gamma*delta=', power(gamma, delta, p))
+    print(power(beta, gamma, p)*power(gamma, delta, p)%p, '==', power(alpha, hesh, p))
     
     if power(beta, gamma, p)*power(gamma, delta, p)%p==power(alpha, hesh, p):
         print("true")
     else:
         print("lol")
-    
 
 gen_keys()
 gamal()
