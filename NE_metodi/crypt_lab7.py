@@ -53,7 +53,6 @@ def FBI_OPEN_UP():
     print("NC = " + str(int(hmshtrix)))
 
 
-
 def mes_b(mes, b):
     M = []
     for x in range(b):
@@ -88,6 +87,7 @@ def mes_ord(mes):
 
 
 def Cp(hm_0: str, d, e, n):
+    
     hm = int(hm_0, base = 16)
     print("\nstart s\priv")
     s = pow(hm, int(d),n)
