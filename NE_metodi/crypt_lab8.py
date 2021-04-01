@@ -2,20 +2,20 @@ from Crypto.Util import number
 import SHA
 import random
 
-def gen_alpha(a, b):
+def NOD(a, b):
     #генерация образующего элемента
     if a < b:
-        return gen_alpha(b, a)
+        return NOD(b, a)
     elif a % b == 0:
         return b;
     else:
-        return gen_alpha(b, a % b)
+        return NOD(b, a % b)
 
 def gen_keys():
     p = number.getPrime(256, None)
-    alpha = random.randint(pow(10, 20), p)
-    while gen_alpha(p, alpha) != 1:
-        alpha = random.randint(pow(10, 20), p)
+    alpha = random.randint(2, p)
+    while NOD(p, alpha) != 1:
+        alpha = random.randint(pow(2, p))
     a = random.randint(1, p-2)
     beta = pow(alpha, a, p)
     
@@ -43,7 +43,7 @@ def gamal():
         alpha, beta, p = pubfile.read().split('\n')
     alpha, beta, p = int(alpha), int(beta), int(p)
     r = random.randint(1, p-2)
-    while gen_alpha(r, p-1)!=1:
+    while NOD(r, p-1)!=1:
         r = random.randint(1, p-2)
     gamma = power(alpha, r, p)
     r2 = pow(r, -1, p-1)
