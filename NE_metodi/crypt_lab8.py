@@ -45,9 +45,14 @@ def gamal():
     r = random.randint(1, p-2)
     while gen_alpha(r, p-1)!=1:
         r = random.randint(1, p-2)
-    gamma = alpha*r%p
-    delta = ((hesh-alpha*gamma)*r-1)%(p-1)
-    if pow(beta, gamma)*pow(gamma, delta)==alpha*hesh%p:
+    gamma = power(alpha, r, p)
+    r2 = pow(r, -1, p-1)
+    delta = ((hesh-alpha*gamma)*r2)%(p-1)
+
+    print(power(beta, gamma, p), power(gamma, delta, p))
+    print(power(beta, gamma, p)*power(gamma, delta, p)%p, power(alpha, hesh, p))
+    
+    if power(beta, gamma, p)*power(gamma, delta, p)%p==power(alpha, hesh, p):
         print("true")
     else:
         print("lol")
