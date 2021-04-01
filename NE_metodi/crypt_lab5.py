@@ -87,7 +87,6 @@ def E(x, cycle, cycle1, cycle2, leng):
 def sigma(x, cycle, cycle1, cycle2, leng):
     return shift(x, cycle, leng)^shift(x, cycle1, leng)^(x>>cycle2)
 
-
 def sha256(res):
     K = []
     res = bitstring(res)
@@ -211,7 +210,7 @@ def sha512(res):
     G = format(H[0][N],'x')+format(H[1][N],'x')+format(H[2][N],'x')+format(H[3][N],'x')+format(H[4][N],'x')+format(H[5][N],'x')+format(H[6][N],'x')+format(H[7][N],'x')
     print(G)
 
-#............................menu..............................#
+
 def choose_text():
     flag1 = True
     while flag1:
@@ -229,6 +228,7 @@ def choose_text():
         else:
             print("Error")
 
+
 def choose_file():
     flag = True
     while flag:
@@ -243,9 +243,10 @@ def choose_file():
             pass
 
 
+#............................menu..............................#
+
 choose = int(input("What do we do? - 256/512 (1\\2)\n"))
 res = choose_text()
-res1 = res
 if choose==1:
     #print(sha256(res.encode('utf-8')).hexdigest())
     sha256(res)
