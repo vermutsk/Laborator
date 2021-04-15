@@ -76,7 +76,22 @@ def check_A(z_A, z_B):
 flag = True
 while flag:
     z = random.getrandbits(8)
-    hesh_type = choose_type_hesh_fun()
+    hesh_type = 0
+    while True:
+        mes = input('Выберите функцию хеширования:\n1. SHA_256\n2. SHA_512\n3. STRIBOG_256\n4. STRIBOG_512 \n >>')
+        if mes == '1':
+            hesh_type = 1
+        elif mes == '2':
+            hesh_type = 2
+        elif mes == '3':
+            hesh_type = 3
+        elif mes == '4':
+            hesh_type = 4
+        else:
+            print('Error')
+        if hesh_type != 0:
+            flag = False
+        
     key_list = RSA.GenKeys()
     h_z, A, E_z, E_A = A_to_B_1(z, hesh_type, key_list)
     z_B = B_to_A_2(h_z, A, E_z, E_A, key_list, hesh_type)
