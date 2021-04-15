@@ -31,30 +31,6 @@ def Euclead(a, b):
     return (d, b)
 
 
-# def Miller_Rabin(chislo):
-#     f = True
-#     while f:
-#         i = 1
-#         if (chislo - 1)%(2**i) == 0 and ((chislo - 1)/(2**i))%2 != 0:
-#             r = int((chislo - 1)/(2**i))
-#             s = i
-#             f = False
-#         else:
-#             i += 1
-#     a = random.randint(2, chislo - 2)
-#     y = (a**r)%chislo
-#     if y != 1 and y != chislo - 1:
-#         j = 1
-#         if j <= s-1 and y != chislo - 1:
-#             y = (y**2)%chislo
-#             if y == 1:
-#                 return 0
-#             j += 1
-#         if y != chislo - 1:
-#             return 0
-#     return 1
-
-
 def GenPrChZadRazm():
     PrCh = [37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
             107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
@@ -78,26 +54,6 @@ def GenPrChZadRazm():
     i = random.randint(0, len(PrCh))
     prostoe = PrCh[i]
     return prostoe
-    # f = True
-    # while f:
-    #     k = random.randint(6,15)
-    #     l = '1'
-    #     for i in range(2, k-1):
-    #         l = l + str(random.randint(0,1))
-    #     l = l + '1'
-    #     l = int(l, 2)
-    #     print(l)
-    #     for j in PrCh:
-    #         if l != j and l%j == 0:
-    #             f = False
-    #             return 0
-    #         elif l == j:
-    #             return l
-    #     for k in range(100):
-    #         if Miller_Rabin(l) == 0:
-    #             f = False
-    #             return 0
-
 
 def GenKeys():
     p = GenPrChZadRazm()
