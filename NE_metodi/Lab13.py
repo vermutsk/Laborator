@@ -1,5 +1,5 @@
 import SHA
-import stibog
+import Stibog
 import RSA
 import random
 
