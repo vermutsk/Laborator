@@ -21,7 +21,7 @@ def fi(n):
     return f;
 
 
-def phi(n: int) -> int:
+def phi(n: int):
     result = n
     i = 2
     while i**2 < n:
