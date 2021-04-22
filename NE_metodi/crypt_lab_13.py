@@ -20,7 +20,7 @@ def hesh_message(message: str, type_hesh: int):
 
 # Принимает А- идентификатор пользователя А, z - случайное число, type_hesh - ип хеширования(обычно задан сам протоколом)
 # KEYS - ключчи для шифрования и дешифрования(в настоящем протоколе пользователю А извесен только открытый,пользователю В открытый и закрытый через который он и расшифровывает
-def A_to_B_1(z: int, type_hesh: int, KEYS: list):
+def A_to_B(z: int, type_hesh: int, KEYS: list):
     print('Приступаем к процедуре идентификации пользователя A')
     A = random.getrandbits(8)
     h_z = hesh_message(str(z), type_hesh)
@@ -30,7 +30,7 @@ def A_to_B_1(z: int, type_hesh: int, KEYS: list):
 
 
 # Принимает хэшировано z, идентификатор А, Зашифрованное z,зашифрованное А
-def B_to_A_2(h_z, A, E_z, E_A, KEYS, type_hesh):
+def B_to_A(h_z, A, E_z, E_A, KEYS, type_hesh):
     D_A = RSA.Decription(KEYS, E_A)
     if A == D_A:
         print('Пользователь В идентифицировал пользователя А')
@@ -79,8 +79,8 @@ while flag:
         if hesh_type != 0:
             flag2 = False
     key_list = RSA.GenKeys()
-    h_z, A, E_z, E_A = A_to_B_1(z, hesh_type, key_list)
-    z_B = B_to_A_2(h_z, A, E_z, E_A, key_list, hesh_type)
+    h_z, A, E_z, E_A = A_to_B(z, hesh_type, key_list)
+    z_B = B_to_A(h_z, A, E_z, E_A, key_list, hesh_type)
     if z_B == -1:
         print('Повторите протокол с начала')
     else:
