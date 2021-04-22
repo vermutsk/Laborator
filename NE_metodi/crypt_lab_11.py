@@ -5,10 +5,6 @@ import random
 from datetime import datetime
 
 
-def remove_file(file: str):
-    os.remove(file)
-
-
 def AES_encrypt(file_txt: str, key: str, buffsize=512 * 1024):
     file_aes = file_txt + '.aes'  # Зашифрованный файл
     pyAesCrypt.encryptFile(file_txt, file_aes, key, buffsize)
