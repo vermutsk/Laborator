@@ -1,9 +1,7 @@
-
 import pyAesCrypt
 import os
 import random
 from datetime import datetime
-
 
 def AES_encrypt(file_txt: str, key: str, buffsize=512 * 1024):
     file_aes = file_txt + '.aes'  # Зашифрованный файл
@@ -48,7 +46,6 @@ def step_2(User_A,marker,aes_file):
 
 
 def step_3 (User_B,marker,aes_file):
-    #step 4 for B
     AES_decrypt(aes_file,"File_A_From_B_From_A.txt",key)
     os.remove(aes_file)
     with open("File_A_From_B_From_A.txt","r") as file:
@@ -60,10 +57,8 @@ def step_3 (User_B,marker,aes_file):
 
 
 key = gen_key(256)
-
 User_A="id_001"
 User_B="id_002"
-
 
 while True:
     print('>>Выберите идентификатор<<: \n1. Метка врeмени \n2. Случайное число \n3. Выход')
