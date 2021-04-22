@@ -84,5 +84,3 @@ while True:
     aes_file=step_1(marker, User_A)
     aes_file=step_2(User_A,marker,aes_file)
     step_3(User_B,marker,aes_file)
-    break
-    
