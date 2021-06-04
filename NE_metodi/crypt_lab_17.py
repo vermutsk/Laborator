@@ -1,9 +1,8 @@
 import gen_simple as gs
 import random
 
-
 # Функция Эйлера
-def fi(n: int) -> int:
+def fi(n: int):
     f = n;
     if n % 2 == 0:
         while n % 2 == 0:
@@ -24,7 +23,7 @@ def fi(n: int) -> int:
 
 
 # Нахождения всех взаимно простых с num
-def all_num_in_fi(num: int) -> list:
+def all_num_in_fi(num: int):
     simple_list = []
     for i in range(2, num):
         if num % i != 0:
@@ -34,8 +33,8 @@ def all_num_in_fi(num: int) -> list:
     return simple_list
 
 
-# Нахождения всех примитиво поля от простого числа (неоптимизированный) до 16 битов
-def primetive(p: int) -> list:
+# Нахождения всех примитивоb поля от простого числа (неоптимизированный) до 16 битов
+def primetive(p: int):
     gen_field = []
     for i in range(2, p):
         rangee = [x for x in range(1, p)]
@@ -48,36 +47,47 @@ def primetive(p: int) -> list:
     return gen_field
 
 
-# Сеансовый ключ
-def session_key(size: int) -> int:
-    k = random.getrandbits(size)
-    return k
-
 
 # p и g известные данные обоим сторонам
 def A_to_B_1(p: int, g: int):
     x = random.randint(2, p - 2)
-    a = gs.quick_pow_mod(g, x, p)
+    a = pow(g, x, p)
+    print('Параметры пользователя А сформированы')
     return a, x
 
 
 # p и g известные данные обоим сторонам
-def A_to_B_2(p: int, g: int):
+def B_to_A_2(p: int, g: int):
     y = random.randint(2, p - 2)
-    b = gs.quick_pow_mod(g, y, p)
+    b = pow(g, y, p)
+    print('Параметры пользователя В сформированы')
     return b, y
 
 
 # p - общиизвестный параметр, x - вычислялся А на шаге 1, b - передавался в шаге 2
-def A_3(p: int, x: int, b: int) -> int:
-    k = gs.quick_pow_mod(b, x, p)
+def A_3(p: int, x: int, b: int):
+    k = pow(b, x, p)
     return k
 
 
 # p - общиизвестный параметр, y - вычислялся B на шаге 2, a - передавался в шаге 1
-def B_3(p: int, y: int, a: int) -> int:
-    k = gs.quick_pow_mod(a, y, p)
+def B_3(p: int, y: int, a: int):
+    k = pow(a, y, p)
     return k
+
+
+def modul_main(p,g):
+    a, x = A_to_B_1(p, g)
+    b, y = B_to_A_2(p, g)
+    k_A = A_3(p, x, b)
+    k_B = B_3(p, y, a)
+    print(k_A, k_B)
+    if k_A == k_B:
+        print('Распределенные ключи совпадают')
+        return True
+    else:
+        print('Распределенные ключи не совпадают')
+        return False
 
 
 def main():
@@ -86,14 +96,15 @@ def main():
     g_i = random.randint(0, len(g_list))
     g = g_list[g_i]
     a, x = A_to_B_1(p, g)
-    b, y = A_to_B_2(p, g)
+    b, y = B_to_A_2(p, g)
     k_A = A_3(p, x, b)
     k_B = B_3(p, y, a)
     print(k_A, k_B)
     if k_A == k_B:
-        print('Распределенный ключи совпадают')
+        print('Распределенные ключи совпадают')
     else:
         print('Распределенные ключи не совпадают')
+
 
 if __name__ == '__main__':
     main()
